@@ -10,7 +10,7 @@ const essays = await getCollection('essays');
     {
       essays.map((essay) => (
         <li>
-          <a href={`/essays/${essay.id}/`}>{essay.data.title}</a>
+          <a class="font-display" href={`/essays/${essay.id}/`}>{essay.data.title}</a>
           <p>{essay.data.excerpt}</p>
         </li>
       ))
