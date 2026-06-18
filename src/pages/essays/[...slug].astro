@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection, render } from 'astro:content';
 import { selectEssays } from '../../lib/essays';
 import { REPLY_EMAIL } from '../../consts';
+import 'katex/dist/katex.min.css';
 
 export async function getStaticPaths() {
   const { published } = selectEssays(await getCollection('essays'), {

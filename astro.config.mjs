@@ -1,5 +1,7 @@
 import { defineConfig } from 'astro/config';
 import { unified } from '@astrojs/markdown-remark';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import { remarkReadingTime } from './src/lib/remark-reading-time';
 import { coldBrew } from './src/lib/shiki-cold-brew';
 
@@ -10,13 +12,13 @@ import { coldBrew } from './src/lib/shiki-cold-brew';
 export default defineConfig({
   site: 'https://coldbrew.live',
   markdown: {
-    // Top-level shikiConfig still reaches the processor via its `shared`
-    // options, so the custom theme applies without abandoning `unified()`.
     shikiConfig: { theme: coldBrew },
-    // `unified({...})` keeps Astro's defaults (GFM, smartypants, Shiki) and
-    // just appends our build-time reading-time plugin.
+    // remark-math parses `$…$`/`$$…$$`; rehype-katex renders it to HTML+MathML
+    // at build time (no client JS). The KaTeX stylesheet is imported (and thus
+    // self-hosted) in the essay route.
     processor: unified({
-      remarkPlugins: [remarkReadingTime],
+      remarkPlugins: [remarkMath, remarkReadingTime],
+      rehypePlugins: [rehypeKatex],
     }),
   },
 });

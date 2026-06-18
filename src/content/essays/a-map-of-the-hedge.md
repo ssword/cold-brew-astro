@@ -19,7 +19,9 @@ probability distribution over the next token, and the quantity that summarizes
 how spread out that distribution is — how much the model is hedging — is its
 entropy[^entropy]. For a distribution $p$ over $n$ choices it is
 
-$$ H(p) = -\sum_{i} p_i \log p_i $$
+$$
+H(p) = -\sum_{i} p_i \log p_i
+$$
 
 When the model is confident, almost all the mass sits on one token and $H(p)$
 falls close to zero. When it hedges, the mass spreads and $H(p)$ climbs toward

@@ -51,3 +51,27 @@ test('code blocks use the cold-brew Shiki theme', async ({ page }) => {
   const rgbs = tokenColors.map(parseRgb);
   expect(rgbs).toContainEqual([217, 145, 74]); // copper keyword #D9914A
 });
+
+test('inline and display math render via KaTeX, fully self-hosted', async ({ page }) => {
+  const thirdParty: string[] = [];
+  page.on('request', (req) => {
+    const url = new URL(req.url());
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return; // ignore data:/blob:
+    if (url.hostname !== 'localhost' && url.hostname !== '127.0.0.1') thirdParty.push(req.url());
+  });
+
+  await page.goto(ESSAY);
+
+  await expect(page.locator('.katex').first()).toBeVisible(); // inline math
+  await expect(page.locator('.katex-display').first()).toBeVisible(); // display math
+
+  // Display math sits in the wider track, not the prose measure.
+  const [eqWidth, paraWidth] = await Promise.all([
+    page.locator('article.essay .katex-display').first().evaluate((el) => el.clientWidth),
+    page.locator('article.essay p').first().evaluate((el) => el.clientWidth),
+  ]);
+  expect(eqWidth).toBeGreaterThan(paraWidth);
+
+  expect(await page.locator('script[src*="katex" i]').count()).toBe(0); // no client-side math JS
+  expect(thirdParty, `unexpected third-party requests: ${thirdParty.join(', ')}`).toHaveLength(0);
+});
