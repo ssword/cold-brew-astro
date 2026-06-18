@@ -12,6 +12,9 @@ playwright-report/
 # serena
 .serena/
 
+# superpowers brainstorm scratch
+.superpowers/
+
 # dependencies
 node_modules/
 
