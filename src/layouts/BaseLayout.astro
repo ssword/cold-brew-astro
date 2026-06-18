@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import { SITE_TITLE, SITE_TAGLINE, SITE_DESCRIPTION } from '../consts';
+import { SITE_TITLE, SITE_TAGLINE, SITE_DESCRIPTION, SOCIAL } from '../consts';
 
 interface Props {
   title?: string;
@@ -27,5 +27,9 @@ const pageTitle = title ? `${title} — ${SITE_TITLE}` : SITE_TITLE;
     <main>
       <slot />
     </main>
+    <footer class="text-muted">
+      <a class="text-copper underline-offset-4 hover:underline" href={SOCIAL.github} target="_blank" rel="me noopener">GitHub</a>
+      <a class="text-copper underline-offset-4 hover:underline" href={SOCIAL.twitter} target="_blank" rel="me noopener">Twitter</a>
+    </footer>
   </body>
 </html>
