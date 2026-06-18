@@ -37,3 +37,17 @@ test('prose holds a reading measure while code and figures use a wider track', a
   expect(Math.abs(paraLeft - contentLeft)).toBeLessThan(2);
   expect(Math.abs(preLeft - contentLeft)).toBeLessThan(2);
 });
+
+test('code blocks use the cold-brew Shiki theme', async ({ page }) => {
+  await page.goto(ESSAY);
+  const pre = page.locator('article.essay pre').first();
+
+  const bg = await pre.evaluate((el) => getComputedStyle(el).backgroundColor);
+  expect(parseRgb(bg)).toEqual([30, 22, 17]); // panel #1E1611
+
+  const tokenColors = await pre
+    .locator('span')
+    .evaluateAll((els) => els.map((el) => getComputedStyle(el).color));
+  const rgbs = tokenColors.map(parseRgb);
+  expect(rgbs).toContainEqual([217, 145, 74]); // copper keyword #D9914A
+});
