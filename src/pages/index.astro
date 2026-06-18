@@ -1,7 +1,19 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const essays = await getCollection('essays');
 ---
 
 <BaseLayout>
-  <p>Essays will be listed here.</p>
+  <ul>
+    {
+      essays.map((essay) => (
+        <li>
+          <a href={`/essays/${essay.id}/`}>{essay.data.title}</a>
+          <p>{essay.data.excerpt}</p>
+        </li>
+      ))
+    }
+  </ul>
 </BaseLayout>
