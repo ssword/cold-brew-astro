@@ -1,17 +1,31 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
+import { selectEssays } from '../lib/essays';
 
-const essays = await getCollection('essays');
+const { published } = selectEssays(await getCollection('essays'), {
+  includeDrafts: import.meta.env.DEV,
+});
+
+const essays = await Promise.all(
+  published.map(async (essay) => {
+    const { remarkPluginFrontmatter } = await render(essay);
+    return { essay, minutesRead: remarkPluginFrontmatter.minutesRead as number };
+  }),
+);
 ---
 
 <BaseLayout>
   <ul>
     {
-      essays.map((essay) => (
+      essays.map(({ essay, minutesRead }) => (
         <li>
           <a class="font-display" href={`/essays/${essay.id}/`}>{essay.data.title}</a>
+          {essay.data.status === 'steeping' && (
+            <span class="font-ui text-copper" data-status="steeping">steeping</span>
+          )}
           <p>{essay.data.excerpt}</p>
+          <p class="font-ui text-muted">{minutesRead} min read</p>
         </li>
       ))
     }
