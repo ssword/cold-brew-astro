@@ -75,3 +75,22 @@ test('inline and display math render via KaTeX, fully self-hosted', async ({ pag
   expect(await page.locator('script[src*="katex" i]').count()).toBe(0); // no client-side math JS
   expect(thirdParty, `unexpected third-party requests: ${thirdParty.join(', ')}`).toHaveLength(0);
 });
+
+test('footnotes are collected and styled at the foot of the essay', async ({ page }) => {
+  await page.goto(ESSAY);
+
+  const section = page.locator('article.essay section[data-footnotes]');
+  await expect(section).toBeVisible();
+
+  // A reference links to a definition that exists, and the definition links back.
+  const ref = page.locator('a[data-footnote-ref]').first();
+  const href = await ref.getAttribute('href');
+  expect(href).toMatch(/^#/);
+  const def = page.locator(href as string);
+  await expect(def).toBeVisible();
+  await expect(def.locator('a[data-footnote-backref]')).toHaveCount(1);
+
+  // Styled distinctly from body text: a top hairline separator.
+  const borderTopWidth = await section.evaluate((el) => parseFloat(getComputedStyle(el).borderTopWidth));
+  expect(borderTopWidth).toBeGreaterThan(0);
+});
