@@ -94,3 +94,17 @@ test('footnotes are collected and styled at the foot of the essay', async ({ pag
   const borderTopWidth = await section.evaluate((el) => parseFloat(getComputedStyle(el).borderTopWidth));
   expect(borderTopWidth).toBeGreaterThan(0);
 });
+
+test('pull-quotes are visually distinct from body text', async ({ page }) => {
+  await page.goto(ESSAY);
+  const quote = page.locator('article.essay blockquote').first();
+  await expect(quote).toBeVisible();
+
+  const { borderLeftColor, borderLeftWidth, fontStyle } = await quote.evaluate((el) => {
+    const s = getComputedStyle(el);
+    return { borderLeftColor: s.borderLeftColor, borderLeftWidth: s.borderLeftWidth, fontStyle: s.fontStyle };
+  });
+  expect(parseRgb(borderLeftColor)).toEqual([217, 145, 74]); // copper #D9914A
+  expect(parseFloat(borderLeftWidth)).toBeGreaterThan(0);
+  expect(fontStyle).toBe('italic');
+});

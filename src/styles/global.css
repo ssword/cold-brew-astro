@@ -113,3 +113,15 @@
   color: var(--color-copper);
   text-decoration: none;
 }
+
+/* Pull-quotes (scheme A): one copper-rule + italic style serves both real
+   quotations and emphasis (plain Markdown gives us only the blockquote). */
+.essay blockquote {
+  margin-inline: 0;
+  padding-left: 1.25rem;
+  border-left: 3px solid var(--color-copper);
+  font-style: italic;
+  font-size: var(--text-step-1);
+  line-height: 1.5;
+  color: var(--color-cream);
+}
