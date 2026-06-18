@@ -3,7 +3,7 @@ import '../styles/global.css';
 import '@fontsource-variable/fraunces';
 import '@fontsource-variable/newsreader';
 import '@fontsource-variable/ibm-plex-sans';
-import { SITE_TITLE, SITE_TAGLINE, SITE_DESCRIPTION, SOCIAL } from '../consts';
+import { SITE_TITLE, SITE_TAGLINE, SITE_DESCRIPTION, SOCIAL, NAV } from '../consts';
 
 interface Props {
   title?: string;
@@ -26,6 +26,15 @@ const pageTitle = title ? `${title} — ${SITE_TITLE}` : SITE_TITLE;
     <header>
       <a class="font-display" href="/">{SITE_TITLE}</a>
       <p class="font-ui">{SITE_TAGLINE}</p>
+      <nav class="font-ui" aria-label="Primary">
+        {
+          NAV.map((item) => (
+            <a class="text-cream underline-offset-4 hover:text-copper hover:underline" href={item.href}>
+              {item.label}
+            </a>
+          ))
+        }
+      </nav>
     </header>
     <main>
       <slot />
