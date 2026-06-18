@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection, render } from 'astro:content';
 import { selectEssays } from '../../lib/essays';
+import { REPLY_EMAIL } from '../../consts';
 
 export async function getStaticPaths() {
   const { published } = selectEssays(await getCollection('essays'), {
@@ -19,12 +20,15 @@ const minutesRead = remarkPluginFrontmatter.minutesRead as number;
 ---
 
 <BaseLayout title={essay.data.title} description={essay.data.excerpt}>
-  <article>
+  <article class="essay">
     <h1 class="font-display">{essay.data.title}</h1>
     <div class="font-ui text-muted">
       {essay.data.status === 'steeping' && <span class="text-copper" data-status="steeping">steeping</span>}
       <span>{minutesRead} min read</span>
     </div>
     <Content />
+    <aside class="essay-reply font-ui">
+      Found a mistake, or want to push back? <a href={`mailto:${REPLY_EMAIL}`}>Reply by email.</a>
+    </aside>
   </article>
 </BaseLayout>
