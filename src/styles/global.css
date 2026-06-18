@@ -40,6 +40,31 @@
   }
 }
 
+/* Standalone pages (About, Now): the essay reading measure and rhythm,
+   without the essay-only apparatus (footnotes, pull-quotes, reply prompt). */
+.page {
+  max-width: var(--container-prose);
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+.page p {
+  margin-block: 1rem;
+  line-height: 1.7;
+}
+.page a {
+  color: var(--color-copper);
+  text-underline-offset: 4px;
+}
+.page a:hover {
+  text-decoration: underline;
+}
+/* A muted timestamp line — the "Now" page convention (font-ui per the type roles). */
+.page .updated {
+  font-family: var(--font-ui);
+  font-size: var(--text-step--1);
+  color: var(--color-muted);
+}
+
 /* Essay: a quiet reply-by-email prompt at the foot (no comment section). */
 .essay-reply {
   margin-top: 3rem;

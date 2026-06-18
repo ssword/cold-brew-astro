@@ -9,3 +9,9 @@ export const SOCIAL = {
   github: 'https://github.com/ssword',
   twitter: 'https://twitter.com/sswordme',
 } as const;
+
+export const NAV = [
+  { label: 'Essays', href: '/' },
+  { label: 'About', href: '/about/' },
+  { label: 'Now', href: '/now/' },
+] as const;
