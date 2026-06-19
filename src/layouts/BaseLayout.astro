@@ -3,24 +3,23 @@ import '../styles/global.css';
 import '@fontsource-variable/fraunces';
 import '@fontsource-variable/newsreader';
 import '@fontsource-variable/ibm-plex-sans';
-import { SITE_TITLE, SITE_TAGLINE, SITE_DESCRIPTION, SOCIAL, NAV } from '../consts';
+import { SITE_TITLE, SITE_TAGLINE, SOCIAL, NAV } from '../consts';
+import BaseHead from '../components/BaseHead.astro';
 
 interface Props {
   title?: string;
   description?: string;
+  image?: string;
+  type?: 'website' | 'article';
 }
 
-const { title, description = SITE_DESCRIPTION } = Astro.props;
-const pageTitle = title ? `${title} — ${SITE_TITLE}` : SITE_TITLE;
+const { title, description, image, type } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content={description} />
-    <title>{pageTitle}</title>
+    <BaseHead title={title} description={description} image={image} type={type} />
   </head>
   <body class="min-h-screen bg-base text-cream font-body">
     <div data-atmosphere aria-hidden="true">
