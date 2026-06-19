@@ -20,36 +20,38 @@ const rest = essays.slice(1);
 ---
 
 <BaseLayout>
-  <section data-hero>
-    <p class="font-display text-cream">{SITE_DESCRIPTION}</p>
-    <p class="font-ui text-copper">{SITE_TAGLINE}</p>
-  </section>
-  {
-    featured && (
-      <article data-featured>
-        <a class="font-display" href={`/essays/${featured.essay.id}/`}>
-          {featured.essay.data.title}
-        </a>
-        {featured.essay.data.status === 'steeping' && (
-          <span class="font-ui text-copper" data-status="steeping">steeping</span>
-        )}
-        <p>{featured.essay.data.excerpt}</p>
-        <p class="font-ui text-muted">{featured.minutesRead} min read</p>
-      </article>
-    )
-  }
-  <ul data-essay-list>
+  <div class="home">
+    <section data-hero>
+      <p class="font-display text-cream">{SITE_DESCRIPTION}</p>
+      <p class="font-ui text-copper">{SITE_TAGLINE}</p>
+    </section>
     {
-      rest.map(({ essay, minutesRead }) => (
-        <li>
-          <a class="font-display" href={`/essays/${essay.id}/`}>{essay.data.title}</a>
-          {essay.data.status === 'steeping' && (
+      featured && (
+        <article data-featured>
+          <a class="font-display" href={`/essays/${featured.essay.id}/`}>
+            {featured.essay.data.title}
+          </a>
+          {featured.essay.data.status === 'steeping' && (
             <span class="font-ui text-copper" data-status="steeping">steeping</span>
           )}
-          <p>{essay.data.excerpt}</p>
-          <p class="font-ui text-muted">{minutesRead} min read</p>
-        </li>
-      ))
+          <p>{featured.essay.data.excerpt}</p>
+          <p class="font-ui text-muted">{featured.minutesRead} min read</p>
+        </article>
+      )
     }
-  </ul>
+    <ul data-essay-list>
+      {
+        rest.map(({ essay, minutesRead }) => (
+          <li>
+            <a class="font-display" href={`/essays/${essay.id}/`}>{essay.data.title}</a>
+            {essay.data.status === 'steeping' && (
+              <span class="font-ui text-copper" data-status="steeping">steeping</span>
+            )}
+            <p>{essay.data.excerpt}</p>
+            <p class="font-ui text-muted">{minutesRead} min read</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
 </BaseLayout>
