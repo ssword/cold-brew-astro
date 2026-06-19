@@ -23,6 +23,13 @@ const pageTitle = title ? `${title} — ${SITE_TITLE}` : SITE_TITLE;
     <title>{pageTitle}</title>
   </head>
   <body class="min-h-screen bg-base text-cream font-body">
+    <div data-atmosphere aria-hidden="true">
+      <div class="atmo-deep"></div>
+      <div class="atmo-glow"></div>
+      <div class="atmo-particles">
+        {Array.from({ length: 12 }).map(() => <span class="atmo-particle" />)}
+      </div>
+    </div>
     <header>
       <a class="font-display" href="/">{SITE_TITLE}</a>
       <p class="font-ui">{SITE_TAGLINE}</p>
