@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { selectEssays } from '../../src/lib/essays';
+import { selectEssays, tagSlug, groupByTag } from '../../src/lib/essays';
 
 type Lifecycle = 'draft' | 'steeping' | 'brewed';
 
@@ -62,5 +62,23 @@ describe('selectEssays', () => {
     );
     expect(published.map((e) => e.id)).toEqual(['wip', 'pub']);
     expect(tags).toEqual(['stats', 'unfinished']);
+  });
+});
+
+describe('tagSlug', () => {
+  it('lowercases and hyphenates a multi-word tag for use in a URL', () => {
+    expect(tagSlug('Deep Learning')).toBe('deep-learning');
+  });
+});
+
+describe('groupByTag', () => {
+  it('groups essays by tag, tags sorted by name, essays kept in input (newest-first) order', () => {
+    const groups = groupByTag([
+      essay('new', 'brewed', '2026-03-01', ['deep learning', 'stats']),
+      essay('old', 'brewed', '2026-01-01', ['deep learning']),
+    ]);
+    expect(groups.map((g) => g.tag)).toEqual(['deep learning', 'stats']);
+    const dl = groups.find((g) => g.tag === 'deep learning')!;
+    expect(dl.essays.map((e) => e.id)).toEqual(['new', 'old']);
   });
 });
