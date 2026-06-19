@@ -4,6 +4,17 @@ dist/
 # generated types & cache
 .astro/
 
+# test artifacts
+test-results/
+playwright-report/
+/playwright/.cache/
+
+# serena
+.serena/
+
+# superpowers brainstorm scratch
+.superpowers/
+
 # dependencies
 node_modules/
 

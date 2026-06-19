@@ -1,0 +1,38 @@
+{
+  "name": "cold-brew",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test",
+    "test": "astro check && vitest run && playwright test"
+  },
+  "dependencies": {
+    "@astrojs/markdown-remark": "^7.2.0",
+    "@astrojs/rss": "^4.0.18",
+    "@astrojs/sitemap": "^3.7.3",
+    "@fontsource-variable/fraunces": "^5.2.9",
+    "@fontsource-variable/ibm-plex-sans": "^5.2.8",
+    "@fontsource-variable/newsreader": "^5.2.10",
+    "@tailwindcss/postcss": "^4.3.1",
+    "astro": "^6.4.8",
+    "katex": "^0.17.0",
+    "mdast-util-to-string": "^4.0.0",
+    "rehype-katex": "^7.0.1",
+    "remark-math": "^6.0.0",
+    "tailwindcss": "^4.3.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "@playwright/test": "^1.61.0",
+    "@types/mdast": "^4.0.4",
+    "@types/node": "^25.9.3",
+    "typescript": "^5.6.0",
+    "vitest": "^4.1.9"
+  }
+}

@@ -1,0 +1,53 @@
+---
+import '../styles/global.css';
+import '@fontsource-variable/fraunces';
+import '@fontsource-variable/newsreader';
+import '@fontsource-variable/ibm-plex-sans';
+import { SITE_TITLE, SITE_TAGLINE, SOCIAL, NAV } from '../consts';
+import BaseHead from '../components/BaseHead.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+}
+
+const { title, description, image, type } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={title} description={description} image={image} type={type} />
+  </head>
+  <body class="min-h-screen bg-base text-cream font-body">
+    <div data-atmosphere aria-hidden="true">
+      <div class="atmo-deep"></div>
+      <div class="atmo-glow"></div>
+      <div class="atmo-particles">
+        {Array.from({ length: 12 }).map(() => <span class="atmo-particle" />)}
+      </div>
+    </div>
+    <header>
+      <a class="font-display" href="/">{SITE_TITLE}</a>
+      <p class="font-ui">{SITE_TAGLINE}</p>
+      <nav class="font-ui" aria-label="Primary">
+        {
+          NAV.map((item) => (
+            <a class="text-cream underline-offset-4 hover:text-copper hover:underline" href={item.href}>
+              {item.label}
+            </a>
+          ))
+        }
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer class="font-ui text-muted">
+      <a class="text-copper underline-offset-4 hover:underline" href={SOCIAL.github} target="_blank" rel="me noopener">GitHub</a>
+      <a class="text-copper underline-offset-4 hover:underline" href={SOCIAL.twitter} target="_blank" rel="me noopener">Twitter</a>
+    </footer>
+  </body>
+</html>

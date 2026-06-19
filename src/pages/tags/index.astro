@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { selectEssays, groupByTag } from '../../lib/essays';
+
+const { published } = selectEssays(await getCollection('essays'), {
+  includeDrafts: import.meta.env.DEV,
+});
+const groups = groupByTag(published);
+---
+
+<BaseLayout title="Tags" description="Browse essays by theme.">
+  <section data-tag-index>
+    <h1 class="font-display">Tags</h1>
+    <ul>
+      {
+        groups.map((g) => (
+          <li>
+            <a class="font-ui text-copper" href={`/tags/${g.slug}/`}>{g.tag}</a>
+            <span class="font-ui text-muted">{g.essays.length}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>

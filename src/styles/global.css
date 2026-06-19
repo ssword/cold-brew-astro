@@ -1,0 +1,344 @@
+@import "tailwindcss";
+
+/* Design tokens — palette, type scale, spacing, and the font-family chains.
+   Exposed as Tailwind v4 utilities (bg-base, text-cream, font-body, ...). */
+@theme {
+  /* Palette — warm near-black "cold brew", cream text, copper accent. */
+  --color-base: #120d0a;
+  --color-panel: #1e1611;
+  --color-glow: #5c3a22;
+  --color-cream: #eae0d2;
+  --color-muted: #94846f;
+  --color-copper: #d9914a;
+
+  /* Font roles. Each chain keeps a CJK fallback slot before the generic
+     family, so a self-hosted Chinese face can be prepended later without
+     reworking the chain. */
+  --font-display: "Fraunces Variable", "Noto Serif SC", "Songti SC", Georgia, serif;
+  --font-body: "Newsreader Variable", "Noto Serif SC", "Songti SC", Georgia, "Times New Roman", serif;
+  --font-ui: "IBM Plex Sans Variable", "Noto Sans SC", "PingFang SC", ui-sans-serif, system-ui, sans-serif;
+
+  /* Type scale. */
+  --text-step--1: 0.875rem;
+  --text-step-0: 1.125rem;
+  --text-step-1: 1.375rem;
+  --text-step-2: 1.875rem;
+  --text-step-3: 2.5rem;
+  --text-step-4: 3.25rem;
+
+  /* Reading measure — prose held to ~68 characters. */
+  --container-prose: 68ch;
+  /* Wide track — code, math, and figures extend past the prose measure. */
+  --container-wide: 80ch;
+}
+
+@layer base {
+  /* Visible keyboard focus everywhere. */
+  :focus-visible {
+    outline: 2px solid var(--color-copper);
+    outline-offset: 2px;
+  }
+}
+
+/* Submerged atmosphere (issue #6): a decorative, non-interactive layer painted
+   behind all content. Never competes with the text — pointer-events: none keeps
+   it from intercepting clicks; z-index: -1 keeps it behind the in-flow content
+   while the body's base color stays the backstop. */
+[data-atmosphere] {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Deepening: a warm near-black overlay, transparent at the surface and denser
+   below, whose strength is bound to scroll position via a scroll-driven
+   timeline — scrolling a long page darkens it so the reader feels they're
+   sinking. No JS, no time-based motion. */
+.atmo-deep {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 20%, #070503 100%);
+  opacity: 0;
+  animation: atmo-sink linear both;
+  animation-timeline: scroll(root block);
+}
+@keyframes atmo-sink {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Surface glow: warm light entering from above, pooled at the top of the
+   viewport and shifting slowly (transform/opacity only, gentle ease, no bounce). */
+.atmo-glow {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 120%;
+  height: 55vh;
+  transform: translate(-50%, -30%);
+  background: radial-gradient(ellipse at top, rgba(217, 145, 74, 0.12), transparent 70%);
+  animation: atmo-glow-shift 18s ease-in-out infinite alternate;
+}
+@keyframes atmo-glow-shift {
+  from {
+    transform: translate(-50%, -30%);
+    opacity: 0.75;
+  }
+  to {
+    transform: translate(-46%, -26%);
+    opacity: 1;
+  }
+}
+
+/* Particles: fine warm sediment drifting slowly upward (transform/opacity only).
+   Coffee grounds rising in a glass, never snow falling. */
+.atmo-particles {
+  position: absolute;
+  inset: 0;
+}
+.atmo-particle {
+  position: absolute;
+  bottom: -2%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background-color: var(--color-copper);
+  opacity: 0;
+  animation: atmo-rise linear infinite;
+}
+@keyframes atmo-rise {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.28;
+  }
+  88% {
+    opacity: 0.22;
+  }
+  100% {
+    transform: translateY(-104vh);
+    opacity: 0;
+  }
+}
+/* Spread the 12 particles across the width with varied size, speed, and phase
+   so the field looks organic rather than gridded. Negative delays pre-distribute
+   them so the drift is already populated on first paint. */
+.atmo-particle:nth-child(1) {
+  left: 6%;
+  width: 2px;
+  height: 2px;
+  animation-duration: 28s;
+  animation-delay: -3s;
+}
+.atmo-particle:nth-child(2) {
+  left: 15%;
+  animation-duration: 34s;
+  animation-delay: -12s;
+}
+.atmo-particle:nth-child(3) {
+  left: 23%;
+  width: 2px;
+  height: 2px;
+  animation-duration: 24s;
+  animation-delay: -18s;
+}
+.atmo-particle:nth-child(4) {
+  left: 31%;
+  width: 4px;
+  height: 4px;
+  animation-duration: 38s;
+  animation-delay: -7s;
+}
+.atmo-particle:nth-child(5) {
+  left: 42%;
+  animation-duration: 30s;
+  animation-delay: -22s;
+}
+.atmo-particle:nth-child(6) {
+  left: 49%;
+  width: 2px;
+  height: 2px;
+  animation-duration: 26s;
+  animation-delay: -15s;
+}
+.atmo-particle:nth-child(7) {
+  left: 57%;
+  width: 4px;
+  height: 4px;
+  animation-duration: 36s;
+  animation-delay: -2s;
+}
+.atmo-particle:nth-child(8) {
+  left: 66%;
+  animation-duration: 32s;
+  animation-delay: -27s;
+}
+.atmo-particle:nth-child(9) {
+  left: 74%;
+  width: 2px;
+  height: 2px;
+  animation-duration: 22s;
+  animation-delay: -9s;
+}
+.atmo-particle:nth-child(10) {
+  left: 82%;
+  animation-duration: 40s;
+  animation-delay: -19s;
+}
+.atmo-particle:nth-child(11) {
+  left: 90%;
+  width: 4px;
+  height: 4px;
+  animation-duration: 29s;
+  animation-delay: -5s;
+}
+.atmo-particle:nth-child(12) {
+  left: 96%;
+  width: 2px;
+  height: 2px;
+  animation-duration: 35s;
+  animation-delay: -24s;
+}
+
+/* Respect prefers-reduced-motion: all ambient motion stops. The glow holds
+   still, particles freeze, and the deepen no longer tracks scroll. */
+@media (prefers-reduced-motion: reduce) {
+  .atmo-deep,
+  .atmo-glow,
+  .atmo-particle {
+    animation: none;
+  }
+  .atmo-deep {
+    opacity: 0;
+  }
+}
+
+/* Page gutters (issue #11): the global chrome and the listing pages (home, tag
+   index) carry no reading measure of their own, so without this their content
+   runs flush to the viewport edge on small screens. The standalone (.page) and
+   essay (.essay) surfaces manage their own inline padding and are left alone. */
+header,
+footer,
+.home,
+[data-tag-index] {
+  padding-inline: 1.25rem;
+}
+
+/* Standalone pages (About, Now): the essay reading measure and rhythm,
+   without the essay-only apparatus (footnotes, pull-quotes, reply prompt). */
+.page {
+  max-width: var(--container-prose);
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+.page p {
+  margin-block: 1rem;
+  line-height: 1.7;
+}
+.page a {
+  color: var(--color-copper);
+  text-underline-offset: 4px;
+}
+.page a:hover {
+  text-decoration: underline;
+}
+/* A muted timestamp line — the "Now" page convention (font-ui per the type roles). */
+.page .updated {
+  font-family: var(--font-ui);
+  font-size: var(--text-step--1);
+  color: var(--color-muted);
+}
+
+/* Essay: a quiet reply-by-email prompt at the foot (no comment section). */
+.essay-reply {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-glow);
+  color: var(--color-muted);
+}
+.essay-reply a {
+  color: var(--color-copper);
+  text-underline-offset: 4px;
+}
+.essay-reply a:hover {
+  text-decoration: underline;
+}
+
+/* Essay reading surface (issue #4): asymmetric measure. The article is the
+   ~80ch wide track; prose children hold ~68ch and hug the left, while code,
+   math, and figures fill the full width and so extend rightward. */
+.essay {
+  max-width: var(--container-wide);
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+.essay > * {
+  max-width: var(--container-prose);
+}
+.essay > :is(pre, figure, table, .katex-display),
+.essay > :has(.katex-display) {
+  max-width: 100%;
+}
+.essay pre {
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--color-panel);
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
+.essay figure {
+  margin-inline: 0;
+}
+.essay figure svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.essay figcaption {
+  margin-top: 0.5rem;
+  font-family: var(--font-ui);
+  font-size: var(--text-step--1);
+  color: var(--color-muted);
+}
+
+/* Display equations live in the wide track; allow long ones to scroll. */
+.essay .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: 0.25rem;
+}
+
+/* Footnotes: a quiet apparatus at the foot of the essay. */
+.essay .footnotes {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-glow);
+  font-size: var(--text-step--1);
+  color: var(--color-muted);
+}
+.essay .footnotes a {
+  color: var(--color-copper);
+}
+.essay sup a[data-footnote-ref] {
+  color: var(--color-copper);
+  text-decoration: none;
+}
+
+/* Pull-quotes (scheme A): one copper-rule + italic style serves both real
+   quotations and emphasis (plain Markdown gives us only the blockquote). */
+.essay blockquote {
+  margin-inline: 0;
+  padding-left: 1.25rem;
+  border-left: 3px solid var(--color-copper);
+  font-style: italic;
+  font-size: var(--text-step-1);
+  line-height: 1.5;
+  color: var(--color-cream);
+}

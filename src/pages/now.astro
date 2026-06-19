@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { REPLY_EMAIL } from '../consts';
+---
+
+<BaseLayout title="Now">
+  <article class="page">
+    <h1 class="font-display">Now</h1>
+    <p class="updated">Last updated June 2026</p>
+    <p>
+      Right now I'm reading more than I'm writing — mostly about how large
+      language models hold on to information and where they lose it, and what
+      statistics has to say about the gap.
+    </p>
+    <p>
+      I'm slowly drafting a few essays that have been steeping for a while, and
+      rebuilding this site so the writing has a quiet place to live without
+      metrics shouting over it.
+    </p>
+    <p>
+      Away from the screen I'm trying to read on paper again. If any of this
+      overlaps with what you're working on, <a href={`mailto:${REPLY_EMAIL}`}
+      >reply by email</a> — I'd like to hear about it.
+    </p>
+  </article>
+</BaseLayout>

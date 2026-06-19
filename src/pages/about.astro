@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { REPLY_EMAIL } from '../consts';
+---
+
+<BaseLayout title="About">
+  <article class="page">
+    <h1 class="font-display">About</h1>
+    <p>
+      I write here about machine learning, language models, and statistics —
+      slowly, and mostly to find out what I actually think.
+    </p>
+    <p>
+      By day I work close to these systems; the rest of the time I read papers,
+      run small experiments, and explain ideas to myself until they hold still.
+      This site is where some of that lands, once it has steeped long enough to
+      be worth keeping.
+    </p>
+    <p>
+      I'd rather be slow and right than fast and loud, so there are no comments,
+      no view counts, and nothing here is on a schedule. If a piece is wrong, or
+      you want to push back on it, <a href={`mailto:${REPLY_EMAIL}`}>reply by
+      email</a> — I read everything.
+    </p>
+  </article>
+</BaseLayout>
