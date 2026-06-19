@@ -1,4 +1,4 @@
-type Lifecycle = 'draft' | 'steeping' | 'brewed';
+export type Lifecycle = 'draft' | 'steeping' | 'brewed';
 
 interface EssayLike {
   data: { status: Lifecycle; pubDate: Date; tags: string[] };

@@ -1,0 +1,31 @@
+---
+import type { Lifecycle } from '../lib/essays';
+import StatusTag from './StatusTag.astro';
+
+interface Props {
+  essay: { id: string; data: { title: string; excerpt: string; status: Lifecycle } };
+  minutesRead: number;
+  variant: 'featured' | 'list-item';
+}
+
+const { essay, minutesRead, variant } = Astro.props;
+const href = `/essays/${essay.id}/`;
+---
+
+{
+  variant === 'featured' ? (
+    <article data-featured>
+      <a class="font-display" href={href}>{essay.data.title}</a>
+      <StatusTag status={essay.data.status} />
+      <p>{essay.data.excerpt}</p>
+      <p class="font-ui text-muted">{minutesRead} min read</p>
+    </article>
+  ) : (
+    <li>
+      <a class="font-display" href={href}>{essay.data.title}</a>
+      <StatusTag status={essay.data.status} />
+      <p>{essay.data.excerpt}</p>
+      <p class="font-ui text-muted">{minutesRead} min read</p>
+    </li>
+  )
+}
