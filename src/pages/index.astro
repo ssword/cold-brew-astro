@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection, render } from 'astro:content';
 import { selectEssays } from '../lib/essays';
+import { SITE_DESCRIPTION, SITE_TAGLINE } from '../consts';
 
 const { published } = selectEssays(await getCollection('essays'), {
   includeDrafts: import.meta.env.DEV,
@@ -13,12 +14,33 @@ const essays = await Promise.all(
     return { essay, minutesRead: remarkPluginFrontmatter.minutesRead as number };
   }),
 );
+
+const featured = essays.at(0);
+const rest = essays.slice(1);
 ---
 
 <BaseLayout>
-  <ul>
+  <section data-hero>
+    <p class="font-display text-cream">{SITE_DESCRIPTION}</p>
+    <p class="font-ui text-copper">{SITE_TAGLINE}</p>
+  </section>
+  {
+    featured && (
+      <article data-featured>
+        <a class="font-display" href={`/essays/${featured.essay.id}/`}>
+          {featured.essay.data.title}
+        </a>
+        {featured.essay.data.status === 'steeping' && (
+          <span class="font-ui text-copper" data-status="steeping">steeping</span>
+        )}
+        <p>{featured.essay.data.excerpt}</p>
+        <p class="font-ui text-muted">{featured.minutesRead} min read</p>
+      </article>
+    )
+  }
+  <ul data-essay-list>
     {
-      essays.map(({ essay, minutesRead }) => (
+      rest.map(({ essay, minutesRead }) => (
         <li>
           <a class="font-display" href={`/essays/${essay.id}/`}>{essay.data.title}</a>
           {essay.data.status === 'steeping' && (
