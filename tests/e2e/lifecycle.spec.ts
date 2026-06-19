@@ -12,9 +12,12 @@ test('drafts are absent from the production build', async ({ page }) => {
 });
 
 test('the copper steeping tag shows only on steeping essays', async ({ page }) => {
-  // Home listing: exactly the one steeping essay carries the tag.
+  // Home listing: a steeping essay carries the tag; a brewed one does not.
   await page.goto('/');
-  await expect(page.locator('[data-status="steeping"]')).toHaveCount(1);
+  const longSteep = page.locator('[data-essay-list] > li', { hasText: 'The long steep' });
+  await expect(longSteep.locator('[data-status="steeping"]')).toHaveCount(1);
+  const firstLight = page.locator('[data-essay-list] > li', { hasText: 'First light' });
+  await expect(firstLight.locator('[data-status="steeping"]')).toHaveCount(0);
 
   // The steeping essay's own page shows the tag.
   await page.goto('/essays/the-long-steep/');

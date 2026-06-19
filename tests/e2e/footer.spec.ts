@@ -20,7 +20,11 @@ test('footer links show a visible focus ring under keyboard navigation', async (
   const github = page.locator('footer').getByRole('link', { name: /github/i });
 
   // Tab through the page so :focus-visible applies, then stop on the GitHub link.
-  for (let i = 0; i < 12 && !(await github.evaluate((el) => el === document.activeElement)); i++) {
+  // The cap scales with the page's focusable count so it survives a growing essay list.
+  const focusables = await page
+    .locator('a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])')
+    .count();
+  for (let i = 0; i < focusables + 2 && !(await github.evaluate((el) => el === document.activeElement)); i++) {
     await page.keyboard.press('Tab');
   }
   await expect(github).toBeFocused();
