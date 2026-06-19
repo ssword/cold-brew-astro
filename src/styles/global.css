@@ -221,6 +221,17 @@
   }
 }
 
+/* Page gutters (issue #11): the global chrome and the listing pages (home, tag
+   index) carry no reading measure of their own, so without this their content
+   runs flush to the viewport edge on small screens. The standalone (.page) and
+   essay (.essay) surfaces manage their own inline padding and are left alone. */
+header,
+footer,
+.home,
+[data-tag-index] {
+  padding-inline: 1.25rem;
+}
+
 /* Standalone pages (About, Now): the essay reading measure and rhythm,
    without the essay-only apparatus (footnotes, pull-quotes, reply prompt). */
 .page {
