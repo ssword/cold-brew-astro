@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+import { selectEssays, groupByTag } from '../../lib/essays';
+
+export async function getStaticPaths() {
+  const { published } = selectEssays(await getCollection('essays'), {
+    includeDrafts: import.meta.env.DEV,
+  });
+  return Promise.all(
+    groupByTag(published).map(async (group) => {
+      const essays = await Promise.all(
+        group.essays.map(async (essay) => {
+          const { remarkPluginFrontmatter } = await render(essay);
+          return { essay, minutesRead: remarkPluginFrontmatter.minutesRead as number };
+        }),
+      );
+      return { params: { tag: group.slug }, props: { tag: group.tag, essays } };
+    }),
+  );
+}
+
+const { tag, essays } = Astro.props;
+---
+
+<BaseLayout title={tag} description={`Essays tagged ${tag}.`}>
+  <section data-tag-page>
+    <h1 class="font-display">{tag}</h1>
+    <ul data-essay-list>
+      {
+        essays.map(({ essay, minutesRead }) => (
+          <li>
+            <a class="font-display" href={`/essays/${essay.id}/`}>{essay.data.title}</a>
+            {essay.data.status === 'steeping' && (
+              <span class="font-ui text-copper" data-status="steeping">steeping</span>
+            )}
+            <p>{essay.data.excerpt}</p>
+            <p class="font-ui text-muted">{minutesRead} min read</p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>

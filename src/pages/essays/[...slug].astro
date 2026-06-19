@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection, render } from 'astro:content';
-import { selectEssays } from '../../lib/essays';
+import { selectEssays, tagSlug } from '../../lib/essays';
 import { REPLY_EMAIL } from '../../consts';
 import 'katex/dist/katex.min.css';
 
@@ -27,6 +27,15 @@ const minutesRead = remarkPluginFrontmatter.minutesRead as number;
       {essay.data.status === 'steeping' && <span class="text-copper" data-status="steeping">steeping</span>}
       <span>{minutesRead} min read</span>
     </div>
+    {essay.data.tags.length > 0 && (
+      <ul class="font-ui" data-essay-tags>
+        {essay.data.tags.map((tag) => (
+          <li>
+            <a class="text-copper" href={`/tags/${tagSlug(tag)}/`}>{tag}</a>
+          </li>
+        ))}
+      </ul>
+    )}
     <Content />
     <aside class="essay-reply font-ui">
       Found a mistake, or want to push back? <a href={`mailto:${REPLY_EMAIL}`}>Reply by email.</a>
