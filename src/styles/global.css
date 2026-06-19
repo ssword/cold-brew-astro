@@ -40,6 +40,187 @@
   }
 }
 
+/* Submerged atmosphere (issue #6): a decorative, non-interactive layer painted
+   behind all content. Never competes with the text — pointer-events: none keeps
+   it from intercepting clicks; z-index: -1 keeps it behind the in-flow content
+   while the body's base color stays the backstop. */
+[data-atmosphere] {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Deepening: a warm near-black overlay, transparent at the surface and denser
+   below, whose strength is bound to scroll position via a scroll-driven
+   timeline — scrolling a long page darkens it so the reader feels they're
+   sinking. No JS, no time-based motion. */
+.atmo-deep {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 20%, #070503 100%);
+  opacity: 0;
+  animation: atmo-sink linear both;
+  animation-timeline: scroll(root block);
+}
+@keyframes atmo-sink {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Surface glow: warm light entering from above, pooled at the top of the
+   viewport and shifting slowly (transform/opacity only, gentle ease, no bounce). */
+.atmo-glow {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 120%;
+  height: 55vh;
+  transform: translate(-50%, -30%);
+  background: radial-gradient(ellipse at top, rgba(217, 145, 74, 0.12), transparent 70%);
+  animation: atmo-glow-shift 18s ease-in-out infinite alternate;
+}
+@keyframes atmo-glow-shift {
+  from {
+    transform: translate(-50%, -30%);
+    opacity: 0.75;
+  }
+  to {
+    transform: translate(-46%, -26%);
+    opacity: 1;
+  }
+}
+
+/* Particles: fine warm sediment drifting slowly upward (transform/opacity only).
+   Coffee grounds rising in a glass, never snow falling. */
+.atmo-particles {
+  position: absolute;
+  inset: 0;
+}
+.atmo-particle {
+  position: absolute;
+  bottom: -2%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background-color: var(--color-copper);
+  opacity: 0;
+  animation: atmo-rise linear infinite;
+}
+@keyframes atmo-rise {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.28;
+  }
+  88% {
+    opacity: 0.22;
+  }
+  100% {
+    transform: translateY(-104vh);
+    opacity: 0;
+  }
+}
+/* Spread the 12 particles across the width with varied size, speed, and phase
+   so the field looks organic rather than gridded. Negative delays pre-distribute
+   them so the drift is already populated on first paint. */
+.atmo-particle:nth-child(1) {
+  left: 6%;
+  width: 2px;
+  height: 2px;
+  animation-duration: 28s;
+  animation-delay: -3s;
+}
+.atmo-particle:nth-child(2) {
+  left: 15%;
+  animation-duration: 34s;
+  animation-delay: -12s;
+}
+.atmo-particle:nth-child(3) {
+  left: 23%;
+  width: 2px;
+  height: 2px;
+  animation-duration: 24s;
+  animation-delay: -18s;
+}
+.atmo-particle:nth-child(4) {
+  left: 31%;
+  width: 4px;
+  height: 4px;
+  animation-duration: 38s;
+  animation-delay: -7s;
+}
+.atmo-particle:nth-child(5) {
+  left: 42%;
+  animation-duration: 30s;
+  animation-delay: -22s;
+}
+.atmo-particle:nth-child(6) {
+  left: 49%;
+  width: 2px;
+  height: 2px;
+  animation-duration: 26s;
+  animation-delay: -15s;
+}
+.atmo-particle:nth-child(7) {
+  left: 57%;
+  width: 4px;
+  height: 4px;
+  animation-duration: 36s;
+  animation-delay: -2s;
+}
+.atmo-particle:nth-child(8) {
+  left: 66%;
+  animation-duration: 32s;
+  animation-delay: -27s;
+}
+.atmo-particle:nth-child(9) {
+  left: 74%;
+  width: 2px;
+  height: 2px;
+  animation-duration: 22s;
+  animation-delay: -9s;
+}
+.atmo-particle:nth-child(10) {
+  left: 82%;
+  animation-duration: 40s;
+  animation-delay: -19s;
+}
+.atmo-particle:nth-child(11) {
+  left: 90%;
+  width: 4px;
+  height: 4px;
+  animation-duration: 29s;
+  animation-delay: -5s;
+}
+.atmo-particle:nth-child(12) {
+  left: 96%;
+  width: 2px;
+  height: 2px;
+  animation-duration: 35s;
+  animation-delay: -24s;
+}
+
+/* Respect prefers-reduced-motion: all ambient motion stops. The glow holds
+   still, particles freeze, and the deepen no longer tracks scroll. */
+@media (prefers-reduced-motion: reduce) {
+  .atmo-deep,
+  .atmo-glow,
+  .atmo-particle {
+    animation: none;
+  }
+  .atmo-deep {
+    opacity: 0;
+  }
+}
+
 /* Standalone pages (About, Now): the essay reading measure and rhythm,
    without the essay-only apparatus (footnotes, pull-quotes, reply prompt). */
 .page {
