@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection, render } from 'astro:content';
 import { selectEssays, tagSlug } from '../../lib/essays';
+import StatusTag from '../../components/StatusTag.astro';
 import { REPLY_EMAIL } from '../../consts';
 import 'katex/dist/katex.min.css';
 
@@ -24,7 +25,7 @@ const minutesRead = remarkPluginFrontmatter.minutesRead as number;
   <article class="essay">
     <h1 class="font-display">{essay.data.title}</h1>
     <div class="font-ui text-muted">
-      {essay.data.status === 'steeping' && <span class="text-copper" data-status="steeping">steeping</span>}
+      <StatusTag status={essay.data.status} />
       <span>{minutesRead} min read</span>
     </div>
     {essay.data.tags.length > 0 && (

@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection, render } from 'astro:content';
 import { selectEssays, groupByTag } from '../../lib/essays';
+import EssayCard from '../../components/EssayCard.astro';
 
 export async function getStaticPaths() {
   const { published } = selectEssays(await getCollection('essays'), {
@@ -29,14 +30,7 @@ const { tag, essays } = Astro.props;
     <ul data-essay-list>
       {
         essays.map(({ essay, minutesRead }) => (
-          <li>
-            <a class="font-display" href={`/essays/${essay.id}/`}>{essay.data.title}</a>
-            {essay.data.status === 'steeping' && (
-              <span class="font-ui text-copper" data-status="steeping">steeping</span>
-            )}
-            <p>{essay.data.excerpt}</p>
-            <p class="font-ui text-muted">{minutesRead} min read</p>
-          </li>
+          <EssayCard essay={essay} minutesRead={minutesRead} variant="list-item" />
         ))
       }
     </ul>

@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection, render } from 'astro:content';
 import { selectEssays } from '../lib/essays';
+import EssayCard from '../components/EssayCard.astro';
 import { SITE_DESCRIPTION, SITE_TAGLINE } from '../consts';
 
 const { published } = selectEssays(await getCollection('essays'), {
@@ -25,31 +26,11 @@ const rest = essays.slice(1);
       <p class="font-display text-cream">{SITE_DESCRIPTION}</p>
       <p class="font-ui text-copper">{SITE_TAGLINE}</p>
     </section>
-    {
-      featured && (
-        <article data-featured>
-          <a class="font-display" href={`/essays/${featured.essay.id}/`}>
-            {featured.essay.data.title}
-          </a>
-          {featured.essay.data.status === 'steeping' && (
-            <span class="font-ui text-copper" data-status="steeping">steeping</span>
-          )}
-          <p>{featured.essay.data.excerpt}</p>
-          <p class="font-ui text-muted">{featured.minutesRead} min read</p>
-        </article>
-      )
-    }
+    {featured && <EssayCard essay={featured.essay} minutesRead={featured.minutesRead} variant="featured" />}
     <ul data-essay-list>
       {
         rest.map(({ essay, minutesRead }) => (
-          <li>
-            <a class="font-display" href={`/essays/${essay.id}/`}>{essay.data.title}</a>
-            {essay.data.status === 'steeping' && (
-              <span class="font-ui text-copper" data-status="steeping">steeping</span>
-            )}
-            <p>{essay.data.excerpt}</p>
-            <p class="font-ui text-muted">{minutesRead} min read</p>
-          </li>
+          <EssayCard essay={essay} minutesRead={minutesRead} variant="list-item" />
         ))
       }
     </ul>
