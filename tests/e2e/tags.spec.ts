@@ -3,16 +3,17 @@ import { test, expect } from '@playwright/test';
 // E2E runs against the production build (see playwright.config.ts): drafts are
 // absent, so tags carried only by a draft must not surface anywhere.
 
-test('the tag index lists every published tag and excludes draft-only tags', async ({ page }) => {
+test('the tag index lists published tags alphabetically and excludes draft-only tags', async ({ page }) => {
   await page.goto('/tags/');
 
-  // Published tags only, alphabetical. "notes" lives solely on a draft, so it is absent.
-  await expect(page.locator('[data-tag-index] a')).toHaveText([
-    'deep learning',
-    'language models',
-    'training',
-    'uncertainty',
-  ]);
+  const tags = (await page.locator('[data-tag-index] a').allTextContents()).map((t) => t.trim());
+
+  // Alphabetical, drawn only from published essays. "notes" lives solely on a draft.
+  expect(tags).toEqual([...tags].sort());
+  expect(tags).toEqual(
+    expect.arrayContaining(['deep learning', 'language models', 'statistics', 'training', 'uncertainty']),
+  );
+  expect(tags).not.toContain('notes');
 
   await expect(page.getByRole('link', { name: 'language models' })).toHaveAttribute(
     'href',
@@ -20,21 +21,27 @@ test('the tag index lists every published tag and excludes draft-only tags', asy
   );
 });
 
-test('a per-tag page lists its essays newest-first with reading time and the steeping tag', async ({
+test('a per-tag page lists its essays newest-first, badging only the steeping ones', async ({
   page,
 }) => {
   await page.goto('/tags/language-models/');
 
   await expect(page.getByRole('heading', { level: 1, name: 'language models' })).toBeVisible();
 
-  // Newest-first: "A map of the hedge" (2026-06-19) before "The long steep" (2026-05-20).
-  await expect(page.locator('[data-essay-list] > li a.font-display')).toHaveText([
-    'A map of the hedge',
-    'The long steep',
-  ]);
+  const titles = (
+    await page.locator('[data-essay-list] > li a.font-display').allTextContents()
+  ).map((t) => t.trim());
 
-  // The long steep is steeping, so exactly one steeping tag shows on this listing.
-  await expect(page.locator('[data-status="steeping"]')).toHaveCount(1);
+  // Newest-first: "A map of the hedge" (2026-06-19) before "The long steep" (2026-05-20).
+  expect(titles).toEqual(expect.arrayContaining(['A map of the hedge', 'The long steep']));
+  expect(titles.indexOf('A map of the hedge')).toBeLessThan(titles.indexOf('The long steep'));
+
+  // The badge marks steeping essays only: it appears on The long steep, not on the brewed A map of the hedge.
+  const longSteep = page.locator('[data-essay-list] > li', { hasText: 'The long steep' });
+  await expect(longSteep.locator('[data-status="steeping"]')).toHaveCount(1);
+  const aMap = page.locator('[data-essay-list] > li', { hasText: 'A map of the hedge' });
+  await expect(aMap.locator('[data-status="steeping"]')).toHaveCount(0);
+
   await expect(page.getByText(/\d+ min read/).first()).toBeVisible();
 });
 

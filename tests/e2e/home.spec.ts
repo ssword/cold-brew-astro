@@ -34,9 +34,15 @@ test('lists the remaining essays newest-first, excluding the featured one', asyn
   // The featured essay is presented above and is not duplicated in the list.
   await expect(list.getByRole('link', { name: 'A map of the hedge' })).toHaveCount(0);
 
-  // The remaining published essays appear, newest-first.
+  // The rest of the published corpus surfaces here (the set may grow or shrink;
+  // we assert ordering behavior, not a fixed list of titles).
   const titles = (await list.locator('li > a').allTextContents()).map((t) => t.trim());
-  expect(titles).toEqual(['First light', 'The long steep']);
+  expect(titles.length).toBeGreaterThan(1);
+
+  // Newest-first: First light (2026-06-01) precedes The long steep (2026-05-20).
+  expect(titles).toContain('First light');
+  expect(titles).toContain('The long steep');
+  expect(titles.indexOf('First light')).toBeLessThan(titles.indexOf('The long steep'));
 
   // Each list item carries its excerpt and reading time.
   const longSteep = list.locator('li', { hasText: 'The long steep' });
