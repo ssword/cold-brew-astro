@@ -1,4 +1,5 @@
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 import { unified } from '@astrojs/markdown-remark';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
@@ -11,6 +12,7 @@ import { coldBrew } from './src/lib/shiki-cold-brew';
 // Astro 6 (withastro/astro#16542).
 export default defineConfig({
   site: 'https://coldbrew.live',
+  integrations: [sitemap()],
   markdown: {
     shikiConfig: { theme: coldBrew },
     // remark-math parses `$…$`/`$$…$$`; rehype-katex renders it to HTML+MathML

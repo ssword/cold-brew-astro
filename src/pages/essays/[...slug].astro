@@ -20,7 +20,7 @@ const { Content, remarkPluginFrontmatter } = await render(essay);
 const minutesRead = remarkPluginFrontmatter.minutesRead as number;
 ---
 
-<BaseLayout title={essay.data.title} description={essay.data.excerpt}>
+<BaseLayout title={essay.data.title} description={essay.data.excerpt} type="article">
   <article class="essay">
     <h1 class="font-display">{essay.data.title}</h1>
     <div class="font-ui text-muted">
