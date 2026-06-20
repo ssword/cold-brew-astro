@@ -1,0 +1,11 @@
+---
+import type { Lifecycle } from '../lib/essays';
+
+interface Props {
+  status: Lifecycle;
+}
+
+const { status } = Astro.props;
+---
+
+{status === 'steeping' && <span class="font-ui text-copper" data-status="steeping">steeping</span>}

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { selectEssays, tagSlug, groupByTag } from '../../src/lib/essays';
+import { selectEssays, publishedEssays, publicEssays, tagSlug, groupByTag, essayHref, minutesReadOf, toDisplayEssays } from '../../src/lib/essays';
 
 type Lifecycle = 'draft' | 'steeping' | 'brewed';
 
@@ -17,27 +17,17 @@ describe('selectEssays', () => {
     expect(published.map((e) => e.id)).toEqual(['a']);
   });
 
-  it('sorts published essays by pubDate, newest first', () => {
+  it('sorts published essays by pubDate, newest first (the newest is the home-page feature)', () => {
     const { published } = selectEssays(
       [
         essay('old', 'brewed', '2026-01-01'),
         essay('new', 'brewed', '2026-03-01'),
         essay('mid', 'steeping', '2026-02-01'),
-      ],
-      { includeDrafts: false },
-    );
-    expect(published.map((e) => e.id)).toEqual(['new', 'mid', 'old']);
-  });
-
-  it('features the most recent published essay (a draft cannot be featured in production)', () => {
-    const { featured } = selectEssays(
-      [
-        essay('brewed-newest', 'brewed', '2026-04-01'),
         essay('draft-newest', 'draft', '2026-09-01'),
       ],
       { includeDrafts: false },
     );
-    expect(featured?.id).toBe('brewed-newest');
+    expect(published.map((e) => e.id)).toEqual(['new', 'mid', 'old']);
   });
 
   it('derives the tag set from published essays only, deduped and sorted', () => {
@@ -65,9 +55,66 @@ describe('selectEssays', () => {
   });
 });
 
+describe('publicEssays (feed entry point)', () => {
+  it('never yields drafts, regardless of environment', () => {
+    const { published } = publicEssays([
+      essay('pub', 'brewed', '2026-01-01'),
+      essay('wip', 'draft', '2026-02-01'),
+    ]);
+    expect(published.map((e) => e.id)).toEqual(['pub']);
+  });
+});
+
+describe('publishedEssays (content-page entry point)', () => {
+  const corpus = [essay('pub', 'brewed', '2026-01-01'), essay('wip', 'draft', '2026-02-01')];
+
+  it('includes drafts when the environment includes them (dev)', () => {
+    const { published } = publishedEssays(corpus, true);
+    expect(published.map((e) => e.id)).toEqual(['wip', 'pub']);
+  });
+
+  it('hides drafts when the environment excludes them (prod)', () => {
+    const { published } = publishedEssays(corpus, false);
+    expect(published.map((e) => e.id)).toEqual(['pub']);
+  });
+
+  it('defaults to the ambient dev flag when none is passed (drafts visible under vitest/dev)', () => {
+    const { published } = publishedEssays(corpus);
+    expect(published.map((e) => e.id)).toEqual(['wip', 'pub']);
+  });
+});
+
 describe('tagSlug', () => {
   it('lowercases and hyphenates a multi-word tag for use in a URL', () => {
     expect(tagSlug('Deep Learning')).toBe('deep-learning');
+  });
+});
+
+describe('essayHref', () => {
+  it('builds the canonical /essays/{id}/ URL from an entry id', () => {
+    expect(essayHref('a-map-of-the-hedge')).toBe('/essays/a-map-of-the-hedge/');
+  });
+});
+
+describe('minutesReadOf', () => {
+  it('reads minutesRead off a rendered essay’s remark frontmatter', () => {
+    expect(minutesReadOf({ remarkPluginFrontmatter: { minutesRead: 7 } })).toBe(7);
+  });
+});
+
+describe('toDisplayEssays', () => {
+  it('maps each essay to its display form (essay, minutesRead, href), preserving order', async () => {
+    const minutes: Record<string, number> = { newest: 9, oldest: 3 };
+    const fakeRender = async (e: { id: string }) => ({
+      remarkPluginFrontmatter: { minutesRead: minutes[e.id] },
+    });
+
+    const display = await toDisplayEssays([{ id: 'newest' }, { id: 'oldest' }], fakeRender);
+
+    expect(display).toEqual([
+      { essay: { id: 'newest' }, minutesRead: 9, href: '/essays/newest/' },
+      { essay: { id: 'oldest' }, minutesRead: 3, href: '/essays/oldest/' },
+    ]);
   });
 });
 
