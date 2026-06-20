@@ -12,7 +12,7 @@ describe('EssayCard', () => {
   it('renders a steeping essay as a list item with its link, excerpt, reading time, and steeping tag', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(EssayCard, {
-      props: { essay: entry('the-long-steep', 'steeping'), minutesRead: 7, variant: 'list-item' },
+      props: { essay: entry('the-long-steep', 'steeping'), href: '/essays/the-long-steep/', minutesRead: 7, variant: 'list-item' },
     });
 
     expect(html).toContain('<li');
@@ -26,7 +26,7 @@ describe('EssayCard', () => {
   it('omits the steeping tag for a brewed essay', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(EssayCard, {
-      props: { essay: entry('first-light', 'brewed'), minutesRead: 4, variant: 'list-item' },
+      props: { essay: entry('first-light', 'brewed'), href: '/essays/first-light/', minutesRead: 4, variant: 'list-item' },
     });
 
     expect(html).toContain('href="/essays/first-light/"');
@@ -36,7 +36,7 @@ describe('EssayCard', () => {
   it('renders the featured variant as a prominent article with link, excerpt, and reading time', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(EssayCard, {
-      props: { essay: entry('a-map-of-the-hedge', 'brewed'), minutesRead: 9, variant: 'featured' },
+      props: { essay: entry('a-map-of-the-hedge', 'brewed'), href: '/essays/a-map-of-the-hedge/', minutesRead: 9, variant: 'featured' },
     });
 
     expect(html).toContain('data-featured');

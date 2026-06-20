@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection, render } from 'astro:content';
-import { selectEssays, groupByTag } from '../../lib/essays';
+import { selectEssays, groupByTag, toDisplayEssays } from '../../lib/essays';
 import EssayCard from '../../components/EssayCard.astro';
 
 export async function getStaticPaths() {
@@ -10,12 +10,7 @@ export async function getStaticPaths() {
   });
   return Promise.all(
     groupByTag(published).map(async (group) => {
-      const essays = await Promise.all(
-        group.essays.map(async (essay) => {
-          const { remarkPluginFrontmatter } = await render(essay);
-          return { essay, minutesRead: remarkPluginFrontmatter.minutesRead as number };
-        }),
-      );
+      const essays = await toDisplayEssays(group.essays, render);
       return { params: { tag: group.slug }, props: { tag: group.tag, essays } };
     }),
   );
@@ -29,8 +24,8 @@ const { tag, essays } = Astro.props;
     <h1 class="font-display">{tag}</h1>
     <ul data-essay-list>
       {
-        essays.map(({ essay, minutesRead }) => (
-          <EssayCard essay={essay} minutesRead={minutesRead} variant="list-item" />
+        essays.map(({ essay, href, minutesRead }) => (
+          <EssayCard essay={essay} href={href} minutesRead={minutesRead} variant="list-item" />
         ))
       }
     </ul>

@@ -3,13 +3,13 @@ import type { Lifecycle } from '../lib/essays';
 import StatusTag from './StatusTag.astro';
 
 interface Props {
-  essay: { id: string; data: { title: string; excerpt: string; status: Lifecycle } };
+  essay: { data: { title: string; excerpt: string; status: Lifecycle } };
+  href: string;
   minutesRead: number;
   variant: 'featured' | 'list-item';
 }
 
-const { essay, minutesRead, variant } = Astro.props;
-const href = `/essays/${essay.id}/`;
+const { essay, href, minutesRead, variant } = Astro.props;
 ---
 
 {
