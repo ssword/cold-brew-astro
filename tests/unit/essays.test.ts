@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { selectEssays, tagSlug, groupByTag, essayHref, minutesReadOf, toDisplayEssays } from '../../src/lib/essays';
+import { selectEssays, publishedEssays, publicEssays, tagSlug, groupByTag, essayHref, minutesReadOf, toDisplayEssays } from '../../src/lib/essays';
 
 type Lifecycle = 'draft' | 'steeping' | 'brewed';
 
@@ -52,6 +52,35 @@ describe('selectEssays', () => {
     );
     expect(published.map((e) => e.id)).toEqual(['wip', 'pub']);
     expect(tags).toEqual(['stats', 'unfinished']);
+  });
+});
+
+describe('publicEssays (feed entry point)', () => {
+  it('never yields drafts, regardless of environment', () => {
+    const { published } = publicEssays([
+      essay('pub', 'brewed', '2026-01-01'),
+      essay('wip', 'draft', '2026-02-01'),
+    ]);
+    expect(published.map((e) => e.id)).toEqual(['pub']);
+  });
+});
+
+describe('publishedEssays (content-page entry point)', () => {
+  const corpus = [essay('pub', 'brewed', '2026-01-01'), essay('wip', 'draft', '2026-02-01')];
+
+  it('includes drafts when the environment includes them (dev)', () => {
+    const { published } = publishedEssays(corpus, true);
+    expect(published.map((e) => e.id)).toEqual(['wip', 'pub']);
+  });
+
+  it('hides drafts when the environment excludes them (prod)', () => {
+    const { published } = publishedEssays(corpus, false);
+    expect(published.map((e) => e.id)).toEqual(['pub']);
+  });
+
+  it('defaults to the ambient dev flag when none is passed (drafts visible under vitest/dev)', () => {
+    const { published } = publishedEssays(corpus);
+    expect(published.map((e) => e.id)).toEqual(['wip', 'pub']);
   });
 });
 

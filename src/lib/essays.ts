@@ -15,6 +15,21 @@ export function selectEssays<T extends EssayLike>(
   return { published, tags };
 }
 
+// The feed is public: drafts are never included, regardless of environment.
+export function publicEssays<T extends EssayLike>(entries: readonly T[]) {
+  return selectEssays(entries, { includeDrafts: false });
+}
+
+// Content pages: drafts follow the environment's draft-visibility policy. The
+// `import.meta.env.DEV` read lives here and nowhere else (drafts in dev, hidden
+// in prod); call sites simply ask for the published essays.
+export function publishedEssays<T extends EssayLike>(
+  entries: readonly T[],
+  includeDrafts = import.meta.env.DEV,
+) {
+  return selectEssays(entries, { includeDrafts });
+}
+
 export function tagSlug(tag: string): string {
   return tag
     .toLowerCase()

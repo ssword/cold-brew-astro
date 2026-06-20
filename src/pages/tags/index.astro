@@ -1,11 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
-import { selectEssays, groupByTag } from '../../lib/essays';
+import { publishedEssays, groupByTag } from '../../lib/essays';
 
-const { published } = selectEssays(await getCollection('essays'), {
-  includeDrafts: import.meta.env.DEV,
-});
+const { published } = publishedEssays(await getCollection('essays'));
 const groups = groupByTag(published);
 ---
 
