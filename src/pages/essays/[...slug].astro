@@ -1,15 +1,13 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection, render } from 'astro:content';
-import { selectEssays, tagSlug, minutesReadOf } from '../../lib/essays';
+import { publishedEssays, tagSlug, minutesReadOf } from '../../lib/essays';
 import StatusTag from '../../components/StatusTag.astro';
 import { REPLY_EMAIL } from '../../consts';
 import 'katex/dist/katex.min.css';
 
 export async function getStaticPaths() {
-  const { published } = selectEssays(await getCollection('essays'), {
-    includeDrafts: import.meta.env.DEV,
-  });
+  const { published } = publishedEssays(await getCollection('essays'));
   return published.map((essay) => ({
     params: { slug: essay.id },
     props: { essay },
