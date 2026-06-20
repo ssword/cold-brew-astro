@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection, render } from 'astro:content';
-import { selectEssays, tagSlug } from '../../lib/essays';
+import { selectEssays, tagSlug, minutesReadOf } from '../../lib/essays';
 import StatusTag from '../../components/StatusTag.astro';
 import { REPLY_EMAIL } from '../../consts';
 import 'katex/dist/katex.min.css';
@@ -17,8 +17,9 @@ export async function getStaticPaths() {
 }
 
 const { essay } = Astro.props;
-const { Content, remarkPluginFrontmatter } = await render(essay);
-const minutesRead = remarkPluginFrontmatter.minutesRead as number;
+const rendered = await render(essay);
+const { Content } = rendered;
+const minutesRead = minutesReadOf(rendered);
 ---
 
 <BaseLayout title={essay.data.title} description={essay.data.excerpt} type="article">

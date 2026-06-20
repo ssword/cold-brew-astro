@@ -1,7 +1,7 @@
 import rss from '@astrojs/rss';
 import type { APIContext } from 'astro';
 import { getCollection } from 'astro:content';
-import { selectEssays } from '../lib/essays';
+import { selectEssays, essayHref } from '../lib/essays';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 
 export async function GET(context: APIContext) {
@@ -16,7 +16,7 @@ export async function GET(context: APIContext) {
       title: essay.data.title,
       pubDate: essay.data.pubDate,
       description: essay.data.excerpt,
-      link: `/essays/${essay.id}/`,
+      link: essayHref(essay.id),
     })),
   });
 }

@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection, render } from 'astro:content';
-import { selectEssays } from '../lib/essays';
+import { selectEssays, toDisplayEssays } from '../lib/essays';
 import EssayCard from '../components/EssayCard.astro';
 import { SITE_DESCRIPTION, SITE_TAGLINE } from '../consts';
 
@@ -9,15 +9,7 @@ const { published } = selectEssays(await getCollection('essays'), {
   includeDrafts: import.meta.env.DEV,
 });
 
-const essays = await Promise.all(
-  published.map(async (essay) => {
-    const { remarkPluginFrontmatter } = await render(essay);
-    return { essay, minutesRead: remarkPluginFrontmatter.minutesRead as number };
-  }),
-);
-
-const featured = essays.at(0);
-const rest = essays.slice(1);
+const [featured, ...rest] = await toDisplayEssays(published, render);
 ---
 
 <BaseLayout>
@@ -26,11 +18,11 @@ const rest = essays.slice(1);
       <p class="font-display text-cream">{SITE_DESCRIPTION}</p>
       <p class="font-ui text-copper">{SITE_TAGLINE}</p>
     </section>
-    {featured && <EssayCard essay={featured.essay} minutesRead={featured.minutesRead} variant="featured" />}
+    {featured && <EssayCard essay={featured.essay} href={featured.href} minutesRead={featured.minutesRead} variant="featured" />}
     <ul data-essay-list>
       {
-        rest.map(({ essay, minutesRead }) => (
-          <EssayCard essay={essay} minutesRead={minutesRead} variant="list-item" />
+        rest.map(({ essay, href, minutesRead }) => (
+          <EssayCard essay={essay} href={href} minutesRead={minutesRead} variant="list-item" />
         ))
       }
     </ul>
