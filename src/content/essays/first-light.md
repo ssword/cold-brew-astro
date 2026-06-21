@@ -6,6 +6,9 @@ status: brewed
 tags:
   - deep learning
   - training
+brewingNotes: >-
+  An Ethiopia Yirgacheffe, V60 at 92°C — bright, floral, and slow to open up,
+  for a piece about the first faint signal in the dark.
 ---
 
 There is a moment, early in training, when the loss is still high and the

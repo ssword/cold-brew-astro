@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection, render } from 'astro:content';
 import { publishedEssays, tagSlug, minutesReadOf } from '../../lib/essays';
 import StatusTag from '../../components/StatusTag.astro';
+import Icon from '../../components/Icon.astro';
 import { REPLY_EMAIL } from '../../consts';
 import 'katex/dist/katex.min.css';
 
@@ -18,27 +19,304 @@ const { essay } = Astro.props;
 const rendered = await render(essay);
 const { Content } = rendered;
 const minutesRead = minutesReadOf(rendered);
+
+const date = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+}).format(essay.data.pubDate);
 ---
 
 <BaseLayout title={essay.data.title} description={essay.data.excerpt} type="article">
-  <article class="essay">
-    <h1 class="font-display">{essay.data.title}</h1>
-    <div class="font-ui text-muted">
-      <StatusTag status={essay.data.status} />
-      <span>{minutesRead} min read</span>
-    </div>
-    {essay.data.tags.length > 0 && (
-      <ul class="font-ui" data-essay-tags>
-        {essay.data.tags.map((tag) => (
-          <li>
-            <a class="text-copper" href={`/tags/${tagSlug(tag)}/`}>{tag}</a>
-          </li>
-        ))}
-      </ul>
-    )}
+  <!-- Reading-progress bar (scroll %), filled in by the reader script. -->
+  <div class="reader-progress" aria-hidden="true"><span data-progress-bar></span></div>
+
+  <article class="essay" data-essay>
+    <header class="essay-head">
+      <div class="essay-meta font-mono">
+        <span>{date}</span>
+        <span class="dot">•</span>
+        <span>{minutesRead} min read</span>
+        <StatusTag status={essay.data.status} />
+      </div>
+
+      <h1 class="serif-display">{essay.data.title}</h1>
+
+      <p class="essay-excerpt font-body">{essay.data.excerpt}</p>
+
+      {essay.data.tags.length > 0 && (
+        <ul class="essay-tags font-mono" data-essay-tags>
+          {essay.data.tags.map((tag) => (
+            <li>
+              <a href={`/tags/${tagSlug(tag)}/`}>{tag}</a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </header>
+
     <Content />
-    <aside class="essay-reply font-ui">
+
+    {essay.data.brewingNotes && (
+      <aside class="pairing coffee-drop-shadow" data-essay-extra>
+        <Icon name="coffee" size={24} class="text-sand" />
+        <div>
+          <h2 class="pairing__title serif-display">Suggested brewing pairing</h2>
+          <p>{essay.data.brewingNotes}</p>
+        </div>
+      </aside>
+    )}
+
+    <aside class="essay-reply font-ui" data-essay-extra>
       Found a mistake, or want to push back? <a href={`mailto:${REPLY_EMAIL}`}>Reply by email.</a>
     </aside>
   </article>
+
+  <!-- Floating reader dock: focus mode + share. -->
+  <div class="reader-dock" data-reader-dock>
+    <button type="button" class="reader-dock__btn reader-dock__focus" data-focus aria-pressed="false">
+      <span data-when="off"><Icon name="eye" size={14} /> Focus</span>
+      <span data-when="on"><Icon name="eye-off" size={14} /> Exit focus</span>
+    </button>
+    <button type="button" class="reader-dock__btn reader-dock__icon" data-share aria-label="Share this essay">
+      <span data-share-default><Icon name="share" size={16} /></span>
+      <span data-share-done hidden><Icon name="check" size={16} /></span>
+    </button>
+  </div>
 </BaseLayout>
+
+<style>
+  .reader-progress {
+    position: fixed;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: var(--color-panel);
+    z-index: 50;
+  }
+  .reader-progress span {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--color-sand);
+    transition: width 0.15s linear;
+  }
+
+  .essay-head {
+    margin-bottom: 3rem;
+  }
+  .essay-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: var(--text-step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--color-sand);
+  }
+  .essay-meta .dot {
+    color: color-mix(in srgb, var(--color-muted) 50%, transparent);
+  }
+  .essay h1.serif-display {
+    margin-top: 1rem;
+    font-size: var(--text-step-3);
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--color-cream);
+  }
+  @media (min-width: 640px) {
+    .essay h1.serif-display {
+      font-size: var(--text-step-4);
+    }
+  }
+  .essay-excerpt {
+    margin-top: 1.25rem;
+    padding: 0.25rem 0 0.25rem 1rem;
+    border-left: 2px solid color-mix(in srgb, var(--color-sand) 35%, transparent);
+    font-style: italic;
+    font-size: var(--text-step-1);
+    line-height: 1.6;
+    color: color-mix(in srgb, var(--color-sand) 75%, var(--color-text));
+  }
+  .essay-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    list-style: none;
+    padding: 0;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .essay-tags a {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border: 1px solid color-mix(in srgb, var(--color-sand) 20%, transparent);
+    border-radius: 9999px;
+    color: var(--color-sand);
+  }
+  .essay-tags a:hover {
+    background: color-mix(in srgb, var(--color-sand) 10%, transparent);
+  }
+
+  /* Coffee-pairing card. */
+  .pairing {
+    display: flex;
+    gap: 1rem;
+    margin-top: 3rem;
+    padding: 1.25rem;
+    border: 1px solid color-mix(in srgb, var(--color-muted) 18%, transparent);
+    background: color-mix(in srgb, var(--color-panel) 40%, transparent);
+    border-radius: 1rem;
+  }
+  .pairing__title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--color-cream);
+  }
+  .pairing p {
+    margin-top: 0.25rem;
+    font-family: var(--font-ui);
+    font-size: var(--text-step--1);
+    line-height: 1.6;
+    color: var(--color-muted);
+  }
+
+  /* Floating dock. */
+  .reader-dock {
+    position: fixed;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .reader-dock__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border-radius: 9999px;
+    border: 1px solid color-mix(in srgb, var(--color-muted) 20%, transparent);
+    background: color-mix(in srgb, var(--color-panel) 80%, transparent);
+    backdrop-filter: blur(8px);
+    color: var(--color-sand);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.6);
+  }
+  .reader-dock__focus {
+    padding: 0.55rem 1rem;
+  }
+  .reader-dock__icon {
+    padding: 0.6rem;
+  }
+  .reader-dock__btn:hover {
+    border-color: var(--color-sand);
+  }
+  .reader-dock__focus[aria-pressed='true'] {
+    background: var(--color-sand);
+    color: var(--color-base);
+    border-color: var(--color-sand);
+    font-weight: 700;
+  }
+  .reader-dock__focus [data-when='on'],
+  .reader-dock__focus[aria-pressed='true'] [data-when='off'] {
+    display: none;
+  }
+  .reader-dock__focus[aria-pressed='true'] [data-when='on'] {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .reader-dock__focus [data-when='off'] {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  /* Focus mode: hide the surrounding chrome and the essay's secondary matter,
+     leaving title + prose. Display-only — nothing that fights reduced-motion. */
+  :global(html[data-focus] header),
+  :global(html[data-focus] footer) {
+    display: none;
+  }
+  :global(html[data-focus]) .essay-meta,
+  :global(html[data-focus]) .essay-excerpt,
+  :global(html[data-focus]) .essay-tags,
+  :global(html[data-focus]) .pairing,
+  :global(html[data-focus]) .essay-reply {
+    display: none;
+  }
+</style>
+
+<script>
+  function setupReader() {
+    const article = document.querySelector<HTMLElement>('[data-essay]');
+    if (!article || article.dataset.readerWired === 'true') return;
+    article.dataset.readerWired = 'true';
+
+    // Scroll-progress bar.
+    const bar = document.querySelector<HTMLElement>('[data-progress-bar]');
+    const onScroll = () => {
+      const doc = document.documentElement;
+      const scrollable = doc.scrollHeight - doc.clientHeight;
+      const pct = scrollable > 0 ? Math.min((doc.scrollTop / scrollable) * 100, 100) : 0;
+      if (bar) bar.style.width = pct + '%';
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    // Focus mode.
+    const focusBtn = document.querySelector<HTMLButtonElement>('[data-focus]');
+    focusBtn?.addEventListener('click', () => {
+      const on = document.documentElement.toggleAttribute('data-focus');
+      focusBtn.setAttribute('aria-pressed', String(on));
+    });
+
+    // Share — native share sheet, falling back to clipboard.
+    const shareBtn = document.querySelector<HTMLButtonElement>('[data-share]');
+    shareBtn?.addEventListener('click', async () => {
+      const url = window.location.href;
+      const title = document.title;
+      try {
+        if (navigator.share) {
+          await navigator.share({ title, url });
+          return;
+        }
+        await navigator.clipboard.writeText(url);
+      } catch {
+        return;
+      }
+      const def = shareBtn.querySelector<HTMLElement>('[data-share-default]');
+      const done = shareBtn.querySelector<HTMLElement>('[data-share-done]');
+      if (def && done) {
+        def.hidden = true;
+        done.hidden = false;
+        setTimeout(() => {
+          def.hidden = false;
+          done.hidden = true;
+        }, 2000);
+      }
+    });
+
+    // Leaving the page (view transitions): drop focus state and the listener.
+    document.addEventListener(
+      'astro:before-swap',
+      () => {
+        document.documentElement.removeAttribute('data-focus');
+        window.removeEventListener('scroll', onScroll);
+      },
+      { once: true },
+    );
+  }
+
+  setupReader();
+  document.addEventListener('astro:page-load', setupReader);
+</script>

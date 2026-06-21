@@ -1,0 +1,125 @@
+---
+/**
+ * Animated coffee-bean logo, ported from the design's CoffeeBeanLogo.tsx.
+ * framer-motion is replaced with CSS: a gentle bean sway and a hanging-drip
+ * bob, both paused under prefers-reduced-motion. Decorative only.
+ */
+interface Props {
+  size?: number;
+  class?: string;
+}
+
+const { size = 52, class: className = '' } = Astro.props;
+const height = Math.round(size * 1.3);
+// Unique gradient ids so multiple logos on a page never collide.
+const uid = Math.random().toString(36).slice(2, 8);
+---
+
+<span class:list={['cb-logo', className]} aria-hidden="true">
+  <svg
+    width={size}
+    height={height}
+    viewBox="0 0 100 130"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <defs>
+      <radialGradient id={`glow-${uid}`} cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#eed9c4" stop-opacity="0.15"></stop>
+        <stop offset="100%" stop-color="#1b1311" stop-opacity="0"></stop>
+      </radialGradient>
+      <linearGradient id={`bean-${uid}`} x1="10" y1="10" x2="90" y2="100" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#eed9c4"></stop>
+        <stop offset="60%" stop-color="#d4bda6"></stop>
+        <stop offset="100%" stop-color="#9e8774"></stop>
+      </linearGradient>
+      <linearGradient id={`drip-${uid}`} x1="50" y1="95" x2="50" y2="125" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#eed9c4"></stop>
+        <stop offset="100%" stop-color="#d4bda6" stop-opacity="0.8"></stop>
+      </linearGradient>
+    </defs>
+
+    <rect x="0" y="0" width="100" height="100" fill={`url(#glow-${uid})`} rx="50"></rect>
+
+    <!-- Bean body (gentle sway) -->
+    <path
+      class="cb-bean"
+      d="M 50,5 C 18,5 10,25 10,50 C 10,75 22,95 50,95 C 78,95 90,75 90,50 C 90,25 82,5 50,5 Z"
+      fill={`url(#bean-${uid})`}
+    ></path>
+
+    <!-- Crease -->
+    <path
+      d="M 50,5 C 45,25 35,40 50,52 C 65,65 55,80 50,95"
+      stroke="#1b1311"
+      stroke-width="4.5"
+      stroke-linecap="round"
+      fill="none"
+      opacity="0.85"
+    ></path>
+
+    <!-- Highlight -->
+    <path
+      d="M 22,25 C 17,40 18,65 30,80"
+      stroke="#ffffff"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      fill="none"
+      opacity="0.25"
+    ></path>
+
+    <!-- Hanging drip (bob) -->
+    <path
+      class="cb-drip"
+      d="M 50,94 C 44,94 40,99 40,106 C 40,114 50,126 50,126 C 50,126 60,114 60,106 C 60,99 56,94 50,94 Z"
+      fill={`url(#drip-${uid})`}
+    ></path>
+  </svg>
+</span>
+
+<style>
+  .cb-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cb-bean {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: cb-sway 8s ease-in-out infinite;
+  }
+
+  .cb-drip {
+    transform-box: fill-box;
+    transform-origin: center top;
+    animation: cb-drip 4s ease-in-out infinite;
+  }
+
+  @keyframes cb-sway {
+    0%,
+    100% {
+      transform: rotate(1deg) scale(0.99);
+    }
+    50% {
+      transform: rotate(-1deg) scale(1.01);
+    }
+  }
+
+  @keyframes cb-drip {
+    0%,
+    100% {
+      transform: translateY(0) scale(1, 1);
+    }
+    50% {
+      transform: translateY(4px) scale(1.08, 0.92);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cb-bean,
+    .cb-drip {
+      animation: none;
+    }
+  }
+</style>

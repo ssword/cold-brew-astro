@@ -18,6 +18,9 @@ playwright-report/
 # dependencies
 node_modules/
 
+# google ai studio design reference (not part of the astro build)
+cold-brew/
+
 # logs
 npm-debug.log*
 yarn-debug.log*

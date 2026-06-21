@@ -1,0 +1,260 @@
+---
+/**
+ * Ambient café audio — synthesized rain / fire-crackle / warm hum, generated
+ * entirely in the browser via the Web Audio API. Ported from the design's
+ * AmbientCafe.tsx to a dependency-free Astro island (vanilla client script).
+ *
+ * Opt-in and muted by default — nothing plays until the reader presses the
+ * toggle (no autoplay), in keeping with the site's quiet, unhurried feel.
+ */
+import Icon from './Icon.astro';
+---
+
+<section class="ambient coffee-drop-shadow" data-ambient>
+  <div class="ambient__head">
+    <div class="ambient__title">
+      <Icon name="coffee" size={18} class="text-sand" />
+      <h3>Ambient Lounge Audio</h3>
+    </div>
+    <button type="button" class="ambient__toggle" data-toggle aria-pressed="false">
+      <span class="ambient__state" data-when="off"><Icon name="volume-x" size={14} /> Muted</span>
+      <span class="ambient__state" data-when="on"><Icon name="volume-2" size={14} /> Lounge live</span>
+    </button>
+  </div>
+
+  <p class="ambient__blurb">
+    Low-frequency café ambience — rain, a faint crackle, and a warm espresso drone — synthesized
+    in your browser to help slow, considered reading.
+  </p>
+
+  <div class="ambient__sliders" data-sliders hidden>
+    <label>
+      <span><Icon name="cloud-rain" size={14} /> Rain hum</span>
+      <input type="range" min="0" max="0.8" step="0.05" value="0.4" data-vol="rain" aria-label="Rain volume" />
+    </label>
+    <label>
+      <span><Icon name="flame" size={14} /> Crackle</span>
+      <input type="range" min="0" max="0.6" step="0.05" value="0.3" data-vol="fire" aria-label="Crackle volume" />
+    </label>
+    <label>
+      <span><Icon name="coffee" size={14} /> Espresso drone</span>
+      <input type="range" min="0" max="0.8" step="0.05" value="0.3" data-vol="hum" aria-label="Drone volume" />
+    </label>
+  </div>
+</section>
+
+<style>
+  .ambient {
+    max-width: 24rem;
+    margin-inline: auto;
+    padding: 1.25rem;
+    border: 1px solid var(--color-panel);
+    background: color-mix(in srgb, var(--color-base) 80%, black);
+    border-radius: 1rem;
+    color: var(--color-text);
+  }
+  .ambient__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .ambient__title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .ambient__title h3 {
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+  .ambient__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 9999px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    background: var(--color-panel);
+    color: var(--color-muted);
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  .ambient__toggle:hover {
+    color: var(--color-text);
+  }
+  .ambient__toggle[aria-pressed='true'] {
+    background: var(--color-sand);
+    color: var(--color-base);
+    font-weight: 600;
+  }
+  .ambient__state {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .ambient__state[data-when='on'] {
+    display: none;
+  }
+  .ambient__toggle[aria-pressed='true'] .ambient__state[data-when='on'] {
+    display: inline-flex;
+  }
+  .ambient__toggle[aria-pressed='true'] .ambient__state[data-when='off'] {
+    display: none;
+  }
+  .ambient__blurb {
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: var(--color-muted);
+    margin-bottom: 1rem;
+  }
+  .ambient__sliders {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    border-top: 1px solid color-mix(in srgb, var(--color-panel) 70%, transparent);
+    padding-top: 0.9rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+  }
+  .ambient__sliders label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .ambient__sliders span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--color-muted);
+  }
+  .ambient__sliders input[type='range'] {
+    width: 6rem;
+    accent-color: var(--color-sand);
+  }
+</style>
+
+<script>
+  // Web Audio engine — created lazily on first play, torn down on stop or when
+  // navigating away (view transitions). Idempotent across astro:page-load.
+  type Nodes = {
+    ctx: AudioContext;
+    sources: AudioScheduledSourceNode[];
+    gains: { rain: GainNode; fire: GainNode; hum: GainNode };
+  };
+
+  function setup() {
+    const root = document.querySelector<HTMLElement>('[data-ambient]');
+    if (!root || root.dataset.wired === 'true') return;
+    root.dataset.wired = 'true';
+
+    const toggle = root.querySelector<HTMLButtonElement>('[data-toggle]')!;
+    const sliders = root.querySelector<HTMLElement>('[data-sliders]')!;
+    const vols = { rain: 0.4, fire: 0.3, hum: 0.3 };
+    let nodes: Nodes | null = null;
+
+    const start = () => {
+      const Ctx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!Ctx) return;
+      const ctx: AudioContext = new Ctx();
+      const sources: AudioScheduledSourceNode[] = [];
+
+      // Rain — filtered white noise.
+      const rainBuf = ctx.createBuffer(1, ctx.sampleRate * 4, ctx.sampleRate);
+      const rainData = rainBuf.getChannelData(0);
+      for (let i = 0; i < rainBuf.length; i++) rainData[i] = Math.random() * 2 - 1;
+      const rain = ctx.createBufferSource();
+      rain.buffer = rainBuf;
+      rain.loop = true;
+      const rainFilter = ctx.createBiquadFilter();
+      rainFilter.type = 'lowpass';
+      rainFilter.frequency.value = 450;
+      const rainGain = ctx.createGain();
+      rainGain.gain.value = vols.rain;
+      rain.connect(rainFilter).connect(rainGain).connect(ctx.destination);
+      rain.start(0);
+      sources.push(rain);
+
+      // Fire — sparse crackle spikes through a bandpass.
+      const fireBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
+      const fireData = fireBuf.getChannelData(0);
+      for (let i = 0; i < fireBuf.length; i++) {
+        const v = Math.random() * 2 - 1;
+        fireData[i] = Math.abs(v) > 0.992 ? v * 0.45 : v * 0.005;
+      }
+      const fire = ctx.createBufferSource();
+      fire.buffer = fireBuf;
+      fire.loop = true;
+      const fireFilter = ctx.createBiquadFilter();
+      fireFilter.type = 'bandpass';
+      fireFilter.frequency.value = 1200;
+      fireFilter.Q.value = 2;
+      const fireGain = ctx.createGain();
+      fireGain.gain.value = vols.fire;
+      fire.connect(fireFilter).connect(fireGain).connect(ctx.destination);
+      fire.start(0);
+      sources.push(fire);
+
+      // Hum — two slightly detuned low oscillators, lowpassed.
+      const osc1 = ctx.createOscillator();
+      osc1.type = 'sine';
+      osc1.frequency.value = 95;
+      const osc2 = ctx.createOscillator();
+      osc2.type = 'triangle';
+      osc2.frequency.value = 95.5;
+      const humFilter = ctx.createBiquadFilter();
+      humFilter.type = 'lowpass';
+      humFilter.frequency.value = 150;
+      const humGain = ctx.createGain();
+      humGain.gain.value = vols.hum * 0.25;
+      osc1.connect(humFilter);
+      osc2.connect(humFilter);
+      humFilter.connect(humGain).connect(ctx.destination);
+      osc1.start(0);
+      osc2.start(0);
+      sources.push(osc1, osc2);
+
+      nodes = { ctx, sources, gains: { rain: rainGain, fire: fireGain, hum: humGain } };
+      toggle.setAttribute('aria-pressed', 'true');
+      sliders.hidden = false;
+    };
+
+    const stop = () => {
+      if (!nodes) return;
+      nodes.sources.forEach((s) => {
+        try {
+          s.stop();
+        } catch {}
+      });
+      nodes.ctx.close();
+      nodes = null;
+      toggle.setAttribute('aria-pressed', 'false');
+      sliders.hidden = true;
+    };
+
+    toggle.addEventListener('click', () => (nodes ? stop() : start()));
+
+    sliders.querySelectorAll<HTMLInputElement>('[data-vol]').forEach((input) => {
+      input.addEventListener('input', () => {
+        const kind = input.dataset.vol as 'rain' | 'fire' | 'hum';
+        vols[kind] = parseFloat(input.value);
+        if (!nodes) return;
+        const target = kind === 'hum' ? vols.hum * 0.25 : vols[kind];
+        nodes.gains[kind].gain.setTargetAtTime(target, nodes.ctx.currentTime, 0.05);
+      });
+    });
+
+    // Stop audio before the page is swapped out under view transitions.
+    document.addEventListener('astro:before-swap', stop, { once: true });
+  }
+
+  setup();
+  document.addEventListener('astro:page-load', setup);
+</script>

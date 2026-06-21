@@ -3,29 +3,59 @@ import type { Lifecycle } from '../lib/essays';
 import StatusTag from './StatusTag.astro';
 
 interface Props {
-  essay: { data: { title: string; excerpt: string; status: Lifecycle } };
+  essay: { data: { title: string; excerpt: string; status: Lifecycle; pubDate: Date } };
   href: string;
   minutesRead: number;
   variant: 'featured' | 'list-item';
 }
 
 const { essay, href, minutesRead, variant } = Astro.props;
+
+const date = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+}).format(essay.data.pubDate);
+
+const featured = variant === 'featured';
+const Tag = featured ? 'article' : 'li';
+const titleSize = featured ? 'text-3xl sm:text-4xl' : 'text-2xl sm:text-3xl';
 ---
 
-{
-  variant === 'featured' ? (
-    <article data-featured>
-      <a class="font-display" href={href}>{essay.data.title}</a>
-      <StatusTag status={essay.data.status} />
-      <p>{essay.data.excerpt}</p>
-      <p class="font-ui text-muted">{minutesRead} min read</p>
-    </article>
-  ) : (
-    <li>
-      <a class="font-display" href={href}>{essay.data.title}</a>
-      <StatusTag status={essay.data.status} />
-      <p>{essay.data.excerpt}</p>
-      <p class="font-ui text-muted">{minutesRead} min read</p>
-    </li>
-  )
-}
+<Tag class="essay-card group relative" data-featured={featured ? '' : undefined}>
+  <span
+    class="absolute -left-4 top-7 hidden h-1.5 w-1.5 -translate-x-1 rounded-full bg-sand opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 sm:block"
+    aria-hidden="true"
+  ></span>
+
+  <div class="flex flex-wrap items-center gap-2 font-mono text-xs uppercase tracking-widest text-muted">
+    <span>{date}</span>
+    <span class="text-muted/40">•</span>
+    <span>{minutesRead} min read</span>
+    <StatusTag status={essay.data.status} />
+  </div>
+
+  <h2 class={`serif-display ${titleSize} mt-2 font-light leading-snug tracking-tight text-cream transition-colors duration-300 group-hover:text-white`}>
+    <a href={href}>{essay.data.title}</a>
+  </h2>
+
+  <p class="mt-2 font-body leading-relaxed text-sand/75 transition-colors duration-500 group-hover:text-sand">
+    {essay.data.excerpt}
+  </p>
+</Tag>
+
+<style>
+  .essay-card {
+    list-style: none;
+    transition: transform 0.5s ease;
+  }
+  .essay-card:hover {
+    transform: scale(1.005);
+  }
+  .essay-card a::after {
+    /* Make the whole card a click target without nesting interactive elements. */
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+</style>
