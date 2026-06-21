@@ -10,6 +10,9 @@ const essays = defineCollection({
     pubDate: z.coerce.date(),
     status: z.enum(['draft', 'steeping', 'brewed']),
     tags: z.array(z.string()).default([]),
+    // Optional editorial flourish: a coffee-pairing note shown as a card at the
+    // foot of the essay. Omitted on most posts; rendered only when present.
+    brewingNotes: z.string().optional(),
   }),
 });
 

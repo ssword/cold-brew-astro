@@ -8,14 +8,14 @@ export const coldBrew: ThemeRegistrationRaw = {
   name: 'cold-brew',
   type: 'dark',
   colors: {
-    'editor.background': '#1E1611',
-    'editor.foreground': '#EAE0D2',
+    'editor.background': '#1B1311',
+    'editor.foreground': '#E8DED4',
   },
   settings: [
-    { settings: { background: '#1E1611', foreground: '#EAE0D2' } },
+    { settings: { background: '#1B1311', foreground: '#E8DED4' } },
     {
       scope: ['comment', 'punctuation.definition.comment'],
-      settings: { foreground: '#94846F', fontStyle: 'italic' },
+      settings: { foreground: '#9E8774', fontStyle: 'italic' },
     },
     {
       scope: ['keyword', 'keyword.control', 'storage', 'storage.type', 'storage.modifier'],
@@ -31,19 +31,19 @@ export const coldBrew: ThemeRegistrationRaw = {
     },
     {
       scope: ['entity.name.function', 'support.function', 'meta.function-call'],
-      settings: { foreground: '#EAE0D2' },
+      settings: { foreground: '#E8DED4' },
     },
     {
       scope: ['variable', 'meta.definition.variable', 'variable.other'],
-      settings: { foreground: '#EAE0D2' },
+      settings: { foreground: '#E8DED4' },
     },
     {
       scope: ['entity.name.type', 'support.type', 'support.class', 'entity.name.class'],
-      settings: { foreground: '#EAE0D2' },
+      settings: { foreground: '#E8DED4' },
     },
     {
       scope: ['keyword.operator', 'punctuation'],
-      settings: { foreground: '#94846F' },
+      settings: { foreground: '#9E8774' },
     },
   ],
 };

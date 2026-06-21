@@ -3,7 +3,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection, render } from 'astro:content';
 import { publishedEssays, toDisplayEssays } from '../lib/essays';
 import EssayCard from '../components/EssayCard.astro';
-import { SITE_DESCRIPTION, SITE_TAGLINE } from '../consts';
+import AmbientCafe from '../components/AmbientCafe.astro';
+import { SITE_DESCRIPTION } from '../consts';
 
 const { published } = publishedEssays(await getCollection('essays'));
 
@@ -11,18 +12,26 @@ const [featured, ...rest] = await toDisplayEssays(published, render);
 ---
 
 <BaseLayout>
-  <div class="home">
-    <section data-hero>
-      <p class="font-display text-cream">{SITE_DESCRIPTION}</p>
-      <p class="font-ui text-copper">{SITE_TAGLINE}</p>
+  <div class="home mx-auto w-full max-w-2xl pb-16">
+    <section data-hero class="pb-12 text-center sm:pb-16">
+      <p class="font-body text-lg italic leading-relaxed text-muted">{SITE_DESCRIPTION}</p>
     </section>
-    {featured && <EssayCard essay={featured.essay} href={featured.href} minutesRead={featured.minutesRead} variant="featured" />}
-    <ul data-essay-list>
-      {
-        rest.map(({ essay, href, minutesRead }) => (
-          <EssayCard essay={essay} href={href} minutesRead={minutesRead} variant="list-item" />
-        ))
-      }
-    </ul>
+
+    <div class="space-y-12 sm:space-y-14">
+      {featured && (
+        <EssayCard essay={featured.essay} href={featured.href} minutesRead={featured.minutesRead} variant="featured" />
+      )}
+      <ul class="space-y-12 sm:space-y-14" data-essay-list>
+        {
+          rest.map(({ essay, href, minutesRead }) => (
+            <EssayCard essay={essay} href={href} minutesRead={minutesRead} variant="list-item" />
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="pt-16 sm:pt-20">
+      <AmbientCafe />
+    </div>
   </div>
 </BaseLayout>

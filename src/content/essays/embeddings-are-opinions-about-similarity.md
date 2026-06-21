@@ -6,6 +6,9 @@ status: brewed
 tags:
   - embeddings
   - representation
+brewingNotes: >-
+  A balanced Sumatra in a French press — full-bodied and a little opinionated,
+  like the geometry it sits beside.
 ---
 
 An embedding looks like a neutral thing — a list of numbers, a point in space,

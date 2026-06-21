@@ -1,22 +1,28 @@
 @import "tailwindcss";
 
 /* Design tokens — palette, type scale, spacing, and the font-family chains.
-   Exposed as Tailwind v4 utilities (bg-base, text-cream, font-body, ...). */
+   Exposed as Tailwind v4 utilities (bg-base, text-cream, font-ui, ...). The
+   palette is the warm "cold brew" coffee scheme from the new design: a near-black
+   roast, cream headings, sand accent, and a slightly dimmer body cream. */
 @theme {
-  /* Palette — warm near-black "cold brew", cream text, copper accent. */
-  --color-base: #120d0a;
-  --color-panel: #1e1611;
-  --color-glow: #5c3a22;
-  --color-cream: #eae0d2;
-  --color-muted: #94846f;
-  --color-copper: #d9914a;
+  /* Palette. `cream` is the bright tone for headings/titles; `text` is the
+     marginally dimmer body tone so headings get a quiet lift. `sand` is the one
+     accent (links, rules, focus) — there is no neon. */
+  --color-base: #0f0a09;
+  --color-panel: #1b1311;
+  --color-cream: #eed9c4;
+  --color-text: #e8ded4;
+  --color-sand: #d4bda6;
+  --color-muted: #9e8774;
 
-  /* Font roles. Each chain keeps a CJK fallback slot before the generic
-     family, so a self-hosted Chinese face can be prepended later without
-     reworking the chain. */
+  /* Font roles. Each chain keeps a CJK fallback slot before the generic family,
+     so a self-hosted Chinese face can be prepended later without reworking it.
+     Display + body stay serif (Fraunces / Newsreader); UI is Inter; metadata,
+     tags, and badges are JetBrains Mono. */
   --font-display: "Fraunces Variable", "Noto Serif SC", "Songti SC", Georgia, serif;
   --font-body: "Newsreader Variable", "Noto Serif SC", "Songti SC", Georgia, "Times New Roman", serif;
-  --font-ui: "IBM Plex Sans Variable", "Noto Sans SC", "PingFang SC", ui-sans-serif, system-ui, sans-serif;
+  --font-ui: "Inter Variable", "Noto Sans SC", "PingFang SC", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, monospace;
 
   /* Type scale. */
   --text-step--1: 0.875rem;
@@ -35,15 +41,54 @@
 @layer base {
   /* Visible keyboard focus everywhere. */
   :focus-visible {
-    outline: 2px solid var(--color-copper);
+    outline: 2px solid var(--color-sand);
     outline-offset: 2px;
   }
 }
 
-/* Submerged atmosphere (issue #6): a decorative, non-interactive layer painted
-   behind all content. Never competes with the text — pointer-events: none keeps
-   it from intercepting clicks; z-index: -1 keeps it behind the in-flow content
-   while the body's base color stays the backstop. */
+/* The base font is Inter (UI); serif is applied to the prose surfaces only.
+   Base colors are set here too so the page never depends on a utility class
+   resolving — the warm near-black backstop and cream text are guaranteed. */
+body {
+  background-color: var(--color-base);
+  color: var(--color-text);
+  font-family: var(--font-ui);
+}
+
+/* Fraunces, used for display, with oldstyle figures for an editorial feel. */
+.serif-display {
+  font-family: var(--font-display);
+  font-variant-numeric: oldstyle-nums;
+}
+
+/* Soft drop shadow for raised panels (pairing card, audio station, drawers). */
+.coffee-drop-shadow {
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.7);
+}
+
+/* Custom scrollbar matching the coffee theme. */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-base);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-panel);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted);
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   Submerged atmosphere (issue #6, restyled): a decorative, non-interactive
+   layer painted behind all content — swirling steam and translucent coffee
+   stains. Never competes with the text: pointer-events: none keeps it from
+   intercepting clicks; z-index: -1 keeps it behind in-flow content while the
+   body's base color stays the backstop. All motion pauses under
+   prefers-reduced-motion.
+   ─────────────────────────────────────────────────────────────────────────── */
 [data-atmosphere] {
   position: fixed;
   inset: 0;
@@ -52,199 +97,180 @@
   overflow: hidden;
 }
 
-/* Deepening: a warm near-black overlay, transparent at the surface and denser
-   below, whose strength is bound to scroll position via a scroll-driven
-   timeline — scrolling a long page darkens it so the reader feels they're
-   sinking. No JS, no time-based motion. */
-.atmo-deep {
+/* Swirling steam lines (SVG strokes inherit this color via currentColor). */
+.atmo-steam {
   position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, transparent 20%, #070503 100%);
-  opacity: 0;
-  animation: atmo-sink linear both;
-  animation-timeline: scroll(root block);
+  width: 20rem;
+  height: 500px;
+  color: rgba(212, 189, 166, 0.1); /* sand @ 10% */
+  animation: atmo-steam 9s ease-in-out infinite;
 }
-@keyframes atmo-sink {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.atmo-steam--left {
+  left: -4rem;
+  top: 25%;
 }
-
-/* Surface glow: warm light entering from above, pooled at the top of the
-   viewport and shifting slowly (transform/opacity only, gentle ease, no bounce). */
-.atmo-glow {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 120%;
-  height: 55vh;
-  transform: translate(-50%, -30%);
-  background: radial-gradient(ellipse at top, rgba(217, 145, 74, 0.12), transparent 70%);
-  animation: atmo-glow-shift 18s ease-in-out infinite alternate;
+.atmo-steam--right {
+  right: -4rem;
+  top: 33%;
+  height: 600px;
+  animation-delay: 3s;
 }
-@keyframes atmo-glow-shift {
-  from {
-    transform: translate(-50%, -30%);
-    opacity: 0.75;
-  }
-  to {
-    transform: translate(-46%, -26%);
-    opacity: 1;
-  }
-}
-
-/* Particles: fine warm sediment drifting slowly upward (transform/opacity only).
-   Coffee grounds rising in a glass, never snow falling. */
-.atmo-particles {
-  position: absolute;
-  inset: 0;
-}
-.atmo-particle {
-  position: absolute;
-  bottom: -2%;
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background-color: var(--color-copper);
-  opacity: 0;
-  animation: atmo-rise linear infinite;
-}
-@keyframes atmo-rise {
+@keyframes atmo-steam {
   0% {
-    transform: translateY(0);
+    transform: translateY(0) scaleX(1) rotate(0deg);
     opacity: 0;
   }
-  12% {
-    opacity: 0.28;
+  15% {
+    opacity: 0.15;
   }
-  88% {
-    opacity: 0.22;
+  50% {
+    transform: translateY(-80px) scaleX(1.15) rotate(5deg);
+    opacity: 0.25;
+  }
+  85% {
+    opacity: 0.1;
   }
   100% {
-    transform: translateY(-104vh);
+    transform: translateY(-180px) scaleX(0.9) rotate(-3deg);
     opacity: 0;
   }
-}
-/* Spread the 12 particles across the width with varied size, speed, and phase
-   so the field looks organic rather than gridded. Negative delays pre-distribute
-   them so the drift is already populated on first paint. */
-.atmo-particle:nth-child(1) {
-  left: 6%;
-  width: 2px;
-  height: 2px;
-  animation-duration: 28s;
-  animation-delay: -3s;
-}
-.atmo-particle:nth-child(2) {
-  left: 15%;
-  animation-duration: 34s;
-  animation-delay: -12s;
-}
-.atmo-particle:nth-child(3) {
-  left: 23%;
-  width: 2px;
-  height: 2px;
-  animation-duration: 24s;
-  animation-delay: -18s;
-}
-.atmo-particle:nth-child(4) {
-  left: 31%;
-  width: 4px;
-  height: 4px;
-  animation-duration: 38s;
-  animation-delay: -7s;
-}
-.atmo-particle:nth-child(5) {
-  left: 42%;
-  animation-duration: 30s;
-  animation-delay: -22s;
-}
-.atmo-particle:nth-child(6) {
-  left: 49%;
-  width: 2px;
-  height: 2px;
-  animation-duration: 26s;
-  animation-delay: -15s;
-}
-.atmo-particle:nth-child(7) {
-  left: 57%;
-  width: 4px;
-  height: 4px;
-  animation-duration: 36s;
-  animation-delay: -2s;
-}
-.atmo-particle:nth-child(8) {
-  left: 66%;
-  animation-duration: 32s;
-  animation-delay: -27s;
-}
-.atmo-particle:nth-child(9) {
-  left: 74%;
-  width: 2px;
-  height: 2px;
-  animation-duration: 22s;
-  animation-delay: -9s;
-}
-.atmo-particle:nth-child(10) {
-  left: 82%;
-  animation-duration: 40s;
-  animation-delay: -19s;
-}
-.atmo-particle:nth-child(11) {
-  left: 90%;
-  width: 4px;
-  height: 4px;
-  animation-duration: 29s;
-  animation-delay: -5s;
-}
-.atmo-particle:nth-child(12) {
-  left: 96%;
-  width: 2px;
-  height: 2px;
-  animation-duration: 35s;
-  animation-delay: -24s;
 }
 
-/* Respect prefers-reduced-motion: all ambient motion stops. The glow holds
-   still, particles freeze, and the deepen no longer tracks scroll. */
-@media (prefers-reduced-motion: reduce) {
-  .atmo-deep,
-  .atmo-glow,
-  .atmo-particle {
-    animation: none;
+/* Translucent cup-ring stains and soft coffee splatters drifting slowly. */
+.atmo-stain,
+.atmo-splatter {
+  position: absolute;
+  animation: atmo-splash 12s ease-in-out infinite;
+}
+.atmo-stain {
+  border-radius: 9999px;
+  border: 1.5px solid rgba(238, 217, 196, 0.15); /* cream @ 15% */
+  left: -5rem;
+  bottom: 3rem;
+  width: 16rem;
+  height: 16rem;
+  opacity: 0.25;
+  filter: blur(1px);
+}
+.atmo-stain--outer {
+  left: -6rem;
+  bottom: 1.5rem;
+  width: 18rem;
+  height: 18rem;
+  border-width: 0.5px;
+  border-color: rgba(238, 217, 196, 0.1);
+  opacity: 0.15;
+  filter: blur(2px);
+  animation-delay: 2s;
+}
+.atmo-splatter {
+  left: 8%;
+  top: 25%;
+  width: 6rem;
+  height: 4rem;
+  background: #b09680;
+  border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+  opacity: 0.15;
+  filter: blur(6px);
+  transform: rotate(15deg);
+}
+.atmo-splatter--dot {
+  left: 7%;
+  top: 33%;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 9999px;
+  opacity: 0.1;
+  filter: blur(3px);
+  transform: none;
+  animation-delay: 4s;
+}
+.atmo-splatter--br {
+  left: auto;
+  right: 12%;
+  top: auto;
+  bottom: 18%;
+  width: 8rem;
+  height: 5rem;
+  background: #6f4e37;
+  border-radius: 50% 40% 30% 60% / 50% 60% 50% 40%;
+  opacity: 0.08;
+  filter: blur(10px);
+  transform: rotate(-25deg);
+}
+.atmo-splatter--br-dot {
+  left: auto;
+  right: 6%;
+  top: auto;
+  bottom: 29%;
+  width: 2rem;
+  height: 2rem;
+  background: #6f4e37;
+  border-radius: 9999px;
+  opacity: 0.08;
+  filter: blur(4px);
+  transform: none;
+  animation: none;
+}
+@keyframes atmo-splash {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1) rotate(var(--atmo-rot, 0deg));
+    opacity: var(--atmo-op, 0.15);
   }
-  .atmo-deep {
-    opacity: 0;
+  33% {
+    transform: translate(5px, -10px) scale(1.05) rotate(calc(var(--atmo-rot, 0deg) + 1deg));
+    opacity: calc(var(--atmo-op, 0.15) + 0.05);
+  }
+  66% {
+    transform: translate(-4px, 5px) scale(0.95) rotate(calc(var(--atmo-rot, 0deg) - 1deg));
+    opacity: calc(var(--atmo-op, 0.15) - 0.03);
   }
 }
+
+/* Respect prefers-reduced-motion: all ambient motion stops. */
+@media (prefers-reduced-motion: reduce) {
+  .atmo-steam,
+  .atmo-stain,
+  .atmo-splatter {
+    animation: none;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
 
 /* Page gutters (issue #11): the global chrome and the listing pages (home, tag
    index) carry no reading measure of their own, so without this their content
    runs flush to the viewport edge on small screens. The standalone (.page) and
    essay (.essay) surfaces manage their own inline padding and are left alone. */
-header,
-footer,
 .home,
 [data-tag-index] {
   padding-inline: 1.25rem;
 }
 
-/* Standalone pages (About, Now): the essay reading measure and rhythm,
-   without the essay-only apparatus (footnotes, pull-quotes, reply prompt). */
+/* Standalone pages (About, Now): the essay reading measure and rhythm, without
+   the essay-only apparatus (footnotes, pull-quotes, reply prompt). */
 .page {
   max-width: var(--container-prose);
   margin-inline: auto;
   padding-inline: 1.25rem;
+  font-family: var(--font-body);
+}
+.page h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-step-3);
+  font-weight: 300;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--color-cream);
+  margin-bottom: 1.5rem;
 }
 .page p {
   margin-block: 1rem;
   line-height: 1.7;
 }
 .page a {
-  color: var(--color-copper);
+  color: var(--color-sand);
   text-underline-offset: 4px;
 }
 .page a:hover {
@@ -261,11 +287,12 @@ footer,
 .essay-reply {
   margin-top: 3rem;
   padding-top: 1.5rem;
-  border-top: 1px solid var(--color-glow);
+  border-top: 1px solid var(--color-panel);
   color: var(--color-muted);
+  font-family: var(--font-ui);
 }
 .essay-reply a {
-  color: var(--color-copper);
+  color: var(--color-sand);
   text-underline-offset: 4px;
 }
 .essay-reply a:hover {
@@ -279,6 +306,7 @@ footer,
   max-width: var(--container-wide);
   margin-inline: auto;
   padding-inline: 1.25rem;
+  font-family: var(--font-body);
 }
 .essay > * {
   max-width: var(--container-prose);
@@ -287,11 +315,54 @@ footer,
 .essay > :has(.katex-display) {
   max-width: 100%;
 }
+
+/* Body prose rhythm. */
+.essay p {
+  line-height: 1.75;
+  margin-block: 1.25rem;
+}
+
+/* Section headings within the prose, set in Fraunces with a quiet rule. */
+.essay :is(h2, h3) {
+  font-family: var(--font-display);
+  color: var(--color-cream);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+.essay h2 {
+  margin-top: 2.5rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--color-panel);
+  font-size: var(--text-step-2);
+}
+.essay h3 {
+  margin-top: 2rem;
+  font-size: var(--text-step-1);
+}
+
+/* Drop-cap on the opening paragraph — an editorial flourish for the intro. */
+.essay > p:first-of-type::first-letter {
+  float: left;
+  margin-right: 0.6rem;
+  font-family: var(--font-display);
+  font-size: 3.4em;
+  line-height: 0.72;
+  color: var(--color-sand);
+}
+
 .essay pre {
   padding: 1rem 1.25rem;
   border: 1px solid var(--color-panel);
   border-radius: 0.5rem;
   overflow-x: auto;
+}
+.essay :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  color: var(--color-cream);
+  background: var(--color-panel);
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.3rem;
 }
 .essay figure {
   margin-inline: 0;
@@ -319,24 +390,25 @@ footer,
 .essay .footnotes {
   margin-top: 3rem;
   padding-top: 1.5rem;
-  border-top: 1px solid var(--color-glow);
+  border-top: 1px solid var(--color-panel);
   font-size: var(--text-step--1);
   color: var(--color-muted);
 }
 .essay .footnotes a {
-  color: var(--color-copper);
+  color: var(--color-sand);
 }
 .essay sup a[data-footnote-ref] {
-  color: var(--color-copper);
+  color: var(--color-sand);
   text-decoration: none;
 }
 
-/* Pull-quotes (scheme A): one copper-rule + italic style serves both real
+/* Pull-quotes (scheme A): one sand-rule + italic style serves both real
    quotations and emphasis (plain Markdown gives us only the blockquote). */
 .essay blockquote {
   margin-inline: 0;
-  padding-left: 1.25rem;
-  border-left: 3px solid var(--color-copper);
+  margin-block: 2rem;
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  border-left: 3px solid var(--color-sand);
   font-style: italic;
   font-size: var(--text-step-1);
   line-height: 1.5;

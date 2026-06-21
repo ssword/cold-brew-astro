@@ -2,9 +2,13 @@
 import '../styles/global.css';
 import '@fontsource-variable/fraunces';
 import '@fontsource-variable/newsreader';
-import '@fontsource-variable/ibm-plex-sans';
-import { SITE_TITLE, SITE_TAGLINE, SOCIAL, NAV } from '../consts';
+import '@fontsource-variable/inter';
+import '@fontsource-variable/jetbrains-mono';
+import { ClientRouter } from 'astro:transitions';
+import { SITE_TITLE, SITE_TAGLINE, SOCIAL, NAV, REPLY_EMAIL } from '../consts';
 import BaseHead from '../components/BaseHead.astro';
+import CoffeeBeanLogo from '../components/CoffeeBeanLogo.astro';
+import Icon from '../components/Icon.astro';
 
 interface Props {
   title?: string;
@@ -14,40 +18,135 @@ interface Props {
 }
 
 const { title, description, image, type } = Astro.props;
+const year = new Date().getFullYear();
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
     <BaseHead title={title} description={description} image={image} type={type} />
+    <ClientRouter />
   </head>
-  <body class="min-h-screen bg-base text-cream font-body">
+  <body class="min-h-screen bg-base text-text font-ui selection:bg-sand/30 selection:text-cream">
+    <!-- Submerged atmosphere: steam + translucent coffee stains, behind content. -->
     <div data-atmosphere aria-hidden="true">
-      <div class="atmo-deep"></div>
-      <div class="atmo-glow"></div>
-      <div class="atmo-particles">
-        {Array.from({ length: 12 }).map(() => <span class="atmo-particle" />)}
-      </div>
+      <svg class="atmo-steam atmo-steam--left" viewBox="0 0 100 200" fill="none">
+        <path d="M10,190 C30,150 5,110 25,70 C45,30 20,10 40,0" stroke="currentColor" stroke-width="1" stroke-linecap="round"></path>
+      </svg>
+      <svg class="atmo-steam atmo-steam--right" viewBox="0 0 100 200" fill="none">
+        <path d="M90,190 C70,140 95,95 75,50 C55,10 80,5 60,0" stroke="currentColor" stroke-width="1" stroke-linecap="round"></path>
+      </svg>
+      <span class="atmo-stain"></span>
+      <span class="atmo-stain atmo-stain--outer"></span>
+      <span class="atmo-splatter"></span>
+      <span class="atmo-splatter atmo-splatter--dot"></span>
+      <span class="atmo-splatter atmo-splatter--br"></span>
+      <span class="atmo-splatter atmo-splatter--br-dot"></span>
     </div>
-    <header>
-      <a class="font-display" href="/">{SITE_TITLE}</a>
-      <p class="font-ui">{SITE_TAGLINE}</p>
-      <nav class="font-ui" aria-label="Primary">
+
+    <header class="flex flex-col items-center text-center pt-12 pb-10 px-5 select-none">
+      <a href="/" class="flex flex-col items-center group" aria-label={SITE_TITLE}>
+        <CoffeeBeanLogo size={46} class="mb-3" />
+        <span class="serif-display text-4xl sm:text-5xl font-extralight text-cream tracking-tight lowercase transition-colors group-hover:text-white">
+          {SITE_TITLE}
+        </span>
+      </a>
+      <p class="font-display italic text-sm text-muted mt-2 tracking-wide">{SITE_TAGLINE}</p>
+      <nav class="font-mono text-xs uppercase tracking-widest mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2" aria-label="Primary">
         {
           NAV.map((item) => (
-            <a class="text-cream underline-offset-4 hover:text-copper hover:underline" href={item.href}>
+            <a class="text-muted hover:text-sand transition-colors" href={item.href}>
               {item.label}
             </a>
           ))
         }
       </nav>
     </header>
+
     <main>
       <slot />
     </main>
-    <footer class="font-ui text-muted">
-      <a class="text-copper underline-offset-4 hover:underline" href={SOCIAL.github} target="_blank" rel="me noopener">GitHub</a>
-      <a class="text-copper underline-offset-4 hover:underline" href={SOCIAL.twitter} target="_blank" rel="me noopener">Twitter</a>
+
+    <footer class="mt-20 border-t border-panel pt-10 pb-12 px-5 flex flex-col items-center gap-8 font-mono text-xs select-none">
+      <nav class="footer-links flex flex-wrap items-center justify-center gap-x-6 gap-y-3" aria-label="Social">
+        <details class="cb-drawer">
+          <summary class="text-muted hover:text-cream transition-colors">Twitter</summary>
+          <div class="cb-drawer-panel coffee-drop-shadow">
+            <p>Occasional notes on deep learning, statistics, and slow coffee.</p>
+            <div class="cb-drawer-actions">
+              <a href={SOCIAL.twitter} target="_blank" rel="me noopener">Visit profile <Icon name="arrow-up-right" size={12} /></a>
+            </div>
+          </div>
+        </details>
+        <details class="cb-drawer">
+          <summary class="text-muted hover:text-cream transition-colors">GitHub</summary>
+          <div class="cb-drawer-panel coffee-drop-shadow">
+            <p>Notebooks, sources, and the code behind these essays.</p>
+            <div class="cb-drawer-actions">
+              <a href={SOCIAL.github} target="_blank" rel="me noopener">Visit profile <Icon name="arrow-up-right" size={12} /></a>
+            </div>
+          </div>
+        </details>
+        <a class="text-muted hover:text-cream transition-colors inline-flex items-center gap-1.5" href="/rss.xml">
+          <Icon name="rss" size={13} /> RSS
+        </a>
+        <a class="text-sand hover:text-cream transition-colors inline-flex items-center gap-1.5" href={`mailto:${REPLY_EMAIL}`}>
+          <Icon name="arrow-up-right" size={13} /> Reply by email
+        </a>
+      </nav>
+
+      <div class="flex flex-col items-center gap-1 text-[10px] text-muted/60 text-center">
+        <span class="font-display italic">Read deliberately. Sip slowly. Act considerately.</span>
+        <span>© {year} {SITE_TITLE}</span>
+      </div>
     </footer>
+
+    <style>
+      .cb-drawer {
+        position: relative;
+      }
+      .cb-drawer > summary {
+        cursor: pointer;
+        list-style: none;
+      }
+      .cb-drawer > summary::-webkit-details-marker {
+        display: none;
+      }
+      .cb-drawer[open] > summary {
+        color: var(--color-cream);
+      }
+      .cb-drawer-panel {
+        position: absolute;
+        bottom: calc(100% + 0.75rem);
+        left: 50%;
+        transform: translateX(-50%);
+        width: 17rem;
+        max-width: 80vw;
+        z-index: 20;
+        background: var(--color-panel);
+        border: 1px solid color-mix(in srgb, var(--color-muted) 25%, transparent);
+        border-radius: 0.75rem;
+        padding: 1rem;
+        text-align: left;
+        line-height: 1.6;
+        color: var(--color-muted);
+        font-family: var(--font-ui);
+        text-transform: none;
+        letter-spacing: normal;
+      }
+      .cb-drawer-actions {
+        margin-top: 0.6rem;
+      }
+      .cb-drawer-actions a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        color: var(--color-sand);
+        font-family: var(--font-mono);
+      }
+      .cb-drawer-actions a:hover {
+        text-decoration: underline;
+      }
+    </style>
   </body>
 </html>

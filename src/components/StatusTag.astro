@@ -8,4 +8,13 @@ interface Props {
 const { status } = Astro.props;
 ---
 
-{status === 'steeping' && <span class="font-ui text-copper" data-status="steeping">steeping</span>}
+{
+  status === 'steeping' && (
+    <span
+      class="inline-flex items-center rounded-full border border-sand/25 bg-sand/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-sand"
+      data-status="steeping"
+    >
+      steeping
+    </span>
+  )
+}

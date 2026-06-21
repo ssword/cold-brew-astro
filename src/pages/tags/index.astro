@@ -8,14 +8,16 @@ const groups = groupByTag(published);
 ---
 
 <BaseLayout title="Tags" description="Browse essays by theme.">
-  <section data-tag-index>
-    <h1 class="font-display">Tags</h1>
-    <ul>
+  <section data-tag-index class="mx-auto max-w-2xl pb-16">
+    <h1 class="serif-display mb-8 text-3xl font-light tracking-tight text-cream">Tags</h1>
+    <ul class="space-y-3">
       {
         groups.map((g) => (
-          <li>
-            <a class="font-ui text-copper" href={`/tags/${g.slug}/`}>{g.tag}</a>
-            <span class="font-ui text-muted">{g.essays.length}</span>
+          <li class="flex items-baseline justify-between border-b border-panel/60 pb-3">
+            <a class="serif-display text-xl text-cream transition-colors hover:text-white" href={`/tags/${g.slug}/`}>
+              {g.tag}
+            </a>
+            <span class="font-mono text-xs text-muted">{g.essays.length}</span>
           </li>
         ))
       }
