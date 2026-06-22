@@ -19,8 +19,9 @@ async function expectWithinGutter(page: Page, selector: string) {
 test('home content keeps a gutter from the viewport edge on small mobile', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 740 });
   await page.goto('/');
-  // Global chrome plus every home content block.
-  for (const sel of ['header a', '[data-hero] p', '[data-featured]', '[data-essay-list] li', 'footer a']) {
+  // Global chrome plus every home content block. The footer's social links are
+  // collapsed drawers, so we check a visible direct footer link (RSS/email).
+  for (const sel of ['header a', '[data-hero] p', '[data-featured]', '[data-essay-list] li', 'footer nav > a']) {
     await expectWithinGutter(page, sel);
   }
 });

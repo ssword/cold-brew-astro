@@ -29,7 +29,7 @@ test('a per-tag page lists its essays newest-first, badging only the steeping on
   await expect(page.getByRole('heading', { level: 1, name: 'language models' })).toBeVisible();
 
   const titles = (
-    await page.locator('[data-essay-list] > li a.font-display').allTextContents()
+    await page.locator('[data-essay-list] > li h2 a').allTextContents()
   ).map((t) => t.trim());
 
   // Newest-first: "A map of the hedge" (2026-06-19) before "The long steep" (2026-05-20).

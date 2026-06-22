@@ -4,7 +4,7 @@ import { getCollection, render } from 'astro:content';
 import { publishedEssays, toDisplayEssays } from '../lib/essays';
 import EssayCard from '../components/EssayCard.astro';
 import AmbientCafe from '../components/AmbientCafe.astro';
-import { SITE_DESCRIPTION } from '../consts';
+import { SITE_DESCRIPTION, SITE_TAGLINE } from '../consts';
 
 const { published } = publishedEssays(await getCollection('essays'));
 
@@ -15,6 +15,7 @@ const [featured, ...rest] = await toDisplayEssays(published, render);
   <div class="home mx-auto w-full max-w-2xl pb-16">
     <section data-hero class="pb-12 text-center sm:pb-16">
       <p class="font-body text-lg italic leading-relaxed text-muted">{SITE_DESCRIPTION}</p>
+      <p class="font-mono text-xs uppercase tracking-widest text-sand mt-4">{SITE_TAGLINE}</p>
     </section>
 
     <div class="space-y-12 sm:space-y-14">

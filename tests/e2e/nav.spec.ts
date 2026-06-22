@@ -12,8 +12,8 @@ test('the masthead nav links to Essays, About, and Now in the UI font', async ({
   await expect(about).toHaveAttribute('href', '/about/');
   await expect(now).toHaveAttribute('href', '/now/');
 
-  // navigation uses the UI font (IBM Plex Sans), per the type roles
-  expect(await about.evaluate((el) => getComputedStyle(el).fontFamily)).toMatch(/IBM Plex Sans/);
+  // navigation metadata uses the mono type role (JetBrains Mono)
+  expect(await about.evaluate((el) => getComputedStyle(el).fontFamily)).toMatch(/JetBrains Mono/);
 });
 
 test('the masthead nav navigates to the About and Now pages', async ({ page }) => {

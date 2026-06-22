@@ -26,109 +26,72 @@ for (const path of ['/', LONG_ESSAY]) {
   });
 }
 
-test('the background deepens as the reader scrolls down a long page', async ({ page }) => {
+test('swirling steam lines drift in the background and stay fixed to the viewport', async ({ page }) => {
   await page.goto(LONG_ESSAY);
-  const deep = page.locator('[data-atmosphere] .atmo-deep');
-  await expect(deep).toHaveCount(1);
+  const steam = page.locator('[data-atmosphere] .atmo-steam');
+  expect(await steam.count()).toBeGreaterThanOrEqual(2);
 
-  // The deepen is scroll-driven, so the page must actually be scrollable.
-  const scrollable = await page.evaluate(
-    () => document.documentElement.scrollHeight - window.innerHeight,
-  );
-  expect(scrollable).toBeGreaterThan(100);
-
-  const opacity = () => deep.evaluate((el) => Number(getComputedStyle(el).opacity));
-
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await page.waitForTimeout(100);
-  const atTop = await opacity();
-
-  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-  await page.waitForTimeout(100);
-  const atBottom = await opacity();
-
-  expect(atBottom).toBeGreaterThan(atTop);
-});
-
-test('a surface glow sits near the top of the viewport and stays fixed there while scrolling', async ({
-  page,
-}) => {
-  await page.goto(LONG_ESSAY);
-  const glow = page.locator('[data-atmosphere] .atmo-glow');
-  await expect(glow).toHaveCount(1);
-
-  const viewport = page.viewportSize()!;
-
-  const atTop = await glow.boundingBox();
-  expect(atTop).not.toBeNull();
-  // Anchored at the surface (upper half), not the middle or bottom.
-  expect(atTop!.y).toBeLessThan(viewport.height / 2);
-
-  // Fixed to the viewport: scrolling the page does not carry it downward.
-  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-  await page.waitForTimeout(100);
-  const afterScroll = await glow.boundingBox();
-  expect(Math.abs(afterScroll!.y - atTop!.y)).toBeLessThan(20);
-});
-
-test('warm-toned particles drift slowly upward in the background', async ({ page }) => {
-  await page.goto('/');
-  const particles = page.locator('[data-atmosphere] .atmo-particle');
-  expect(await particles.count()).toBeGreaterThanOrEqual(8);
-
-  // Each particle runs a real (named, non-zero) animation...
-  const anim = await particles.first().evaluate((el) => {
+  // Each steam line runs a real (named, non-zero) animation.
+  const anim = await steam.first().evaluate((el) => {
     const s = getComputedStyle(el);
     return { name: s.animationName, duration: parseFloat(s.animationDuration) };
   });
   expect(anim.name).not.toBe('none');
   expect(anim.duration).toBeGreaterThan(0);
 
-  // ...and is warm-toned (red dominant, then green, then blue — coffee sediment,
-  // not snow).
+  // Painted into the fixed atmosphere layer: scrolling does not carry it down.
+  const top = () => steam.first().evaluate((el) => el.getBoundingClientRect().top);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(100);
+  const atTop = await top();
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await page.waitForTimeout(100);
+  // The layer is position:fixed; its anchor doesn't move with the page (the
+  // small delta tolerates the steam's own transform animation).
+  expect(Math.abs((await top()) - atTop)).toBeLessThan(200);
+});
+
+test('translucent coffee stains sit warm-toned in the background', async ({ page }) => {
+  await page.goto('/');
+
+  const stain = page.locator('[data-atmosphere] .atmo-stain').first();
+  const splatter = page.locator('[data-atmosphere] .atmo-splatter').first();
+  await expect(stain).toHaveCount(1);
+
+  // Stains drift on a real animation...
+  const anim = await stain.evaluate((el) => {
+    const s = getComputedStyle(el);
+    return { name: s.animationName, duration: parseFloat(s.animationDuration) };
+  });
+  expect(anim.name).not.toBe('none');
+  expect(anim.duration).toBeGreaterThan(0);
+
+  // ...and the splatter fill is warm-toned (red dominant — coffee, not neon).
   const [r, g, b] = parseRgb(
-    await particles.first().evaluate((el) => getComputedStyle(el).backgroundColor),
+    await splatter.evaluate((el) => getComputedStyle(el).backgroundColor),
   );
   expect(r).toBeGreaterThan(g);
   expect(g).toBeGreaterThan(b);
-
-  // Drifts upward: over ~600ms at least one particle's viewport Y decreases.
-  const tops = () =>
-    particles.evaluateAll((els) => els.map((el) => el.getBoundingClientRect().top));
-  const before = await tops();
-  await page.waitForTimeout(600);
-  const after = await tops();
-  expect(before.some((y, i) => after[i] < y - 1)).toBe(true);
 });
 
 test('all ambient motion pauses under prefers-reduced-motion: reduce', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(LONG_ESSAY);
 
-  // Glow and particles carry no running animation.
+  // Steam, stains, and splatters carry no running animation.
   const animationName = (selector: string) =>
     page
       .locator(`[data-atmosphere] ${selector}`)
       .first()
       .evaluate((el) => getComputedStyle(el).animationName);
-  expect(await animationName('.atmo-glow')).toBe('none');
-  expect(await animationName('.atmo-particle')).toBe('none');
+  expect(await animationName('.atmo-steam')).toBe('none');
+  expect(await animationName('.atmo-stain')).toBe('none');
+  expect(await animationName('.atmo-splatter')).toBe('none');
 
-  // Particles hold still over time.
-  const particles = page.locator('[data-atmosphere] .atmo-particle');
-  const tops = () =>
-    particles.evaluateAll((els) => els.map((el) => el.getBoundingClientRect().top));
-  const before = await tops();
+  // The decorative layer holds still over time.
+  const steam = page.locator('[data-atmosphere] .atmo-steam').first();
+  const top = () => steam.evaluate((el) => el.getBoundingClientRect().top);
+  const before = await top();
   await page.waitForTimeout(600);
-  expect(await tops()).toEqual(before);
-
-  // The deepen no longer responds to scrolling.
-  const deep = page.locator('[data-atmosphere] .atmo-deep');
-  const opacity = () => deep.evaluate((el) => Number(getComputedStyle(el).opacity));
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await page.waitForTimeout(100);
-  const atTop = await opacity();
-  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-  await page.waitForTimeout(100);
-  expect(await opacity()).toBe(atTop);
+  expect(await top()).toBe(before);
 });
