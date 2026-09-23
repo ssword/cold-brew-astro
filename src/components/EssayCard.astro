@@ -1,21 +1,30 @@
 ---
 import type { Lifecycle } from '../lib/essays';
+import {
+  formatEssayDate,
+  languageOf,
+  type EssayLanguage,
+} from '../lib/i18n';
 import StatusTag from './StatusTag.astro';
 
 interface Props {
-  essay: { data: { title: string; excerpt: string; status: Lifecycle; pubDate: Date } };
+  essay: {
+    data: {
+      title: string;
+      excerpt: string;
+      status: Lifecycle;
+      pubDate: Date;
+      lang?: EssayLanguage;
+    };
+  };
   href: string;
   minutesRead: number;
   variant: 'featured' | 'list-item';
 }
 
 const { essay, href, minutesRead, variant } = Astro.props;
-
-const date = new Intl.DateTimeFormat('en-US', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-}).format(essay.data.pubDate);
+const lang = languageOf(essay.data);
+const date = formatEssayDate(essay.data.pubDate, lang);
 
 const featured = variant === 'featured';
 const Tag = featured ? 'article' : 'li';
@@ -31,8 +40,8 @@ const titleSize = featured ? 'text-3xl sm:text-4xl' : 'text-2xl sm:text-3xl';
   <div class="flex flex-wrap items-center gap-2 font-mono text-xs uppercase tracking-widest text-muted">
     <span>{date}</span>
     <span class="text-muted/40">•</span>
-    <span>{minutesRead} min read</span>
-    <StatusTag status={essay.data.status} />
+    <span>{lang === 'zh-CN' ? `约 ${minutesRead} 分钟` : `${minutesRead} min read`}</span>
+    <StatusTag status={essay.data.status} lang={lang} />
   </div>
 
   <h2 class={`serif-display ${titleSize} mt-2 font-light leading-snug tracking-tight text-cream transition-colors duration-300 group-hover:text-white`}>

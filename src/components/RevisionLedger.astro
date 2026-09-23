@@ -1,0 +1,96 @@
+---
+import {
+  formatEssayDate,
+  type EssayLanguage,
+} from '../lib/i18n';
+
+interface Revision {
+  date: Date;
+  summary: string;
+}
+
+interface Props {
+  revisions: readonly Revision[];
+  lang?: EssayLanguage;
+}
+
+const { lang = 'en' } = Astro.props;
+const revisions = [...Astro.props.revisions].sort(
+  (a, b) => b.date.getTime() - a.date.getTime(),
+);
+
+const formatDate = (date: Date) => formatEssayDate(date, lang);
+---
+
+{
+  revisions.length > 0 && (
+    <section
+      class="revision-ledger"
+      data-revision-ledger
+      data-essay-extra
+      aria-labelledby="revision-ledger-title"
+    >
+      <h2 id="revision-ledger-title" class="revision-ledger__title">
+        {lang === 'zh-CN' ? '修订记录' : 'Revision notes'}
+      </h2>
+      <ol>
+        {revisions.map((revision) => (
+          <li>
+            <time datetime={revision.date.toISOString()}>{formatDate(revision.date)}</time>
+            <p>{revision.summary}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+  )
+}
+
+<style>
+  .revision-ledger {
+    margin-top: 3rem;
+    padding: 1.25rem;
+    border: 1px solid color-mix(in srgb, var(--color-muted) 18%, transparent);
+    border-radius: 0.75rem;
+    background: color-mix(in srgb, var(--color-panel) 35%, transparent);
+  }
+  .revision-ledger .revision-ledger__title {
+    margin: 0 0 1rem;
+    padding: 0;
+    border: 0;
+    font-size: var(--text-step-1);
+    font-weight: 400;
+  }
+  .revision-ledger ol {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .revision-ledger li {
+    display: grid;
+    grid-template-columns: minmax(8rem, auto) 1fr;
+    gap: 1rem;
+    align-items: baseline;
+  }
+  .revision-ledger time {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .revision-ledger li p {
+    margin: 0;
+    font-family: var(--font-ui);
+    font-size: var(--text-step--1);
+    line-height: 1.6;
+    color: var(--color-text);
+  }
+  @media (max-width: 520px) {
+    .revision-ledger li {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+    }
+  }
+</style>

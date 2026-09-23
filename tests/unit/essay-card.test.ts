@@ -5,7 +5,12 @@ import type { Lifecycle } from '../../src/lib/essays';
 
 const entry = (id: string, status: Lifecycle) => ({
   id,
-  data: { title: `Title of ${id}`, excerpt: `Excerpt of ${id}.`, status },
+  data: {
+    title: `Title of ${id}`,
+    excerpt: `Excerpt of ${id}.`,
+    status,
+    pubDate: new Date('2026-06-01'),
+  },
 });
 
 describe('EssayCard', () => {

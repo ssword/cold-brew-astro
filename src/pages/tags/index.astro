@@ -2,8 +2,10 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import { publishedEssays, groupByTag } from '../../lib/essays';
+import { essaysInLanguage } from '../../lib/i18n';
 
-const { published } = publishedEssays(await getCollection('essays'));
+const { published: allPublished } = publishedEssays(await getCollection('essays'));
+const published = essaysInLanguage(allPublished, 'en');
 const groups = groupByTag(published);
 ---
 

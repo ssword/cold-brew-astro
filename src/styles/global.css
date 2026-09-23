@@ -19,9 +19,9 @@
      so a self-hosted Chinese face can be prepended later without reworking it.
      Display + body stay serif (Fraunces / Newsreader); UI is Inter; metadata,
      tags, and badges are JetBrains Mono. */
-  --font-display: "Fraunces Variable", "Noto Serif SC", "Songti SC", Georgia, serif;
-  --font-body: "Newsreader Variable", "Noto Serif SC", "Songti SC", Georgia, "Times New Roman", serif;
-  --font-ui: "Inter Variable", "Noto Sans SC", "PingFang SC", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces Variable", "Noto Serif SC Variable", "Noto Serif SC", "Songti SC", Georgia, serif;
+  --font-body: "Newsreader Variable", "Noto Serif SC Variable", "Noto Serif SC", "Songti SC", Georgia, "Times New Roman", serif;
+  --font-ui: "Inter Variable", "Noto Sans SC Variable", "Noto Sans SC", "PingFang SC", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, monospace;
 
   /* Type scale. */

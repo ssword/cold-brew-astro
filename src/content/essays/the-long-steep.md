@@ -2,10 +2,18 @@
 title: The long steep
 excerpt: Why some ideas should be left to sit before they are served.
 pubDate: 2026-05-20
+updatedDate: 2026-07-30
+revisions:
+  - date: 2026-07-30
+    summary: Connected this early intuition to the measurable entropy argument developed in “A map of the hedge.”
 status: steeping
 tags:
   - language models
   - uncertainty
+series: Measuring uncertainty
+seriesOrder: 1
+relatedEssays:
+  - scaling-laws-taught-me-patience
 ---
 
 Some thoughts are ready the moment they arrive. You can write them down in a

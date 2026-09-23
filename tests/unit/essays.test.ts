@@ -1,5 +1,15 @@
 import { describe, it, expect } from 'vitest';
-import { selectEssays, publishedEssays, publicEssays, tagSlug, groupByTag, essayHref, minutesReadOf, toDisplayEssays } from '../../src/lib/essays';
+import {
+  buildEssayTrail,
+  selectEssays,
+  publishedEssays,
+  publicEssays,
+  tagSlug,
+  groupByTag,
+  essayHref,
+  minutesReadOf,
+  toDisplayEssays,
+} from '../../src/lib/essays';
 
 type Lifecycle = 'draft' | 'steeping' | 'brewed';
 
@@ -105,15 +115,29 @@ describe('minutesReadOf', () => {
 describe('toDisplayEssays', () => {
   it('maps each essay to its display form (essay, minutesRead, href), preserving order', async () => {
     const minutes: Record<string, number> = { newest: 9, oldest: 3 };
-    const fakeRender = async (e: { id: string }) => ({
+    const fakeRender = async (e: { id: string; data: Record<string, never> }) => ({
       remarkPluginFrontmatter: { minutesRead: minutes[e.id] },
     });
 
-    const display = await toDisplayEssays([{ id: 'newest' }, { id: 'oldest' }], fakeRender);
+    const display = await toDisplayEssays(
+      [
+        { id: 'newest', data: {} },
+        { id: 'oldest', data: {} },
+      ],
+      fakeRender,
+    );
 
     expect(display).toEqual([
-      { essay: { id: 'newest' }, minutesRead: 9, href: '/essays/newest/' },
-      { essay: { id: 'oldest' }, minutesRead: 3, href: '/essays/oldest/' },
+      {
+        essay: { id: 'newest', data: {} },
+        minutesRead: 9,
+        href: '/essays/newest/',
+      },
+      {
+        essay: { id: 'oldest', data: {} },
+        minutesRead: 3,
+        href: '/essays/oldest/',
+      },
     ]);
   });
 });
@@ -127,5 +151,63 @@ describe('groupByTag', () => {
     expect(groups.map((g) => g.tag)).toEqual(['deep learning', 'stats']);
     const dl = groups.find((g) => g.tag === 'deep learning')!;
     expect(dl.essays.map((e) => e.id)).toEqual(['new', 'old']);
+  });
+});
+
+describe('buildEssayTrail', () => {
+  const trailEssay = (
+    id: string,
+    seriesOrder?: number,
+    relatedEssays: string[] = [],
+  ) => ({
+    id,
+    data: {
+      title: `Title of ${id}`,
+      series: seriesOrder === undefined ? undefined : 'A measured trail',
+      seriesOrder,
+      relatedEssays: relatedEssays.map((relatedId) => ({ id: relatedId })),
+    },
+  });
+
+  it('resolves series position and previous/next essays by explicit order', () => {
+    const first = trailEssay('first', 1);
+    const second = trailEssay('second', 2);
+    const third = trailEssay('third', 3);
+
+    const trail = buildEssayTrail(second, [third, first, second]);
+
+    expect(trail.series).toEqual({
+      title: 'A measured trail',
+      position: 2,
+      total: 3,
+    });
+    expect(trail.previous?.id).toBe('first');
+    expect(trail.next?.id).toBe('third');
+  });
+
+  it('keeps curated related order while hiding drafts and series neighbours', () => {
+    const first = trailEssay('first', 1);
+    const second = trailEssay('second', 2, [
+      'first',
+      'related-b',
+      'draft-related',
+      'related-a',
+      'related-b',
+    ]);
+    const relatedA = trailEssay('related-a');
+    const relatedB = trailEssay('related-b');
+
+    const trail = buildEssayTrail(second, [first, second, relatedA, relatedB]);
+
+    expect(trail.related.map(({ id }) => id)).toEqual(['related-b', 'related-a']);
+  });
+
+  it('rejects ambiguous duplicate positions within a series', () => {
+    const first = trailEssay('first', 1);
+    const duplicate = trailEssay('duplicate', 1);
+
+    expect(() => buildEssayTrail(first, [first, duplicate])).toThrow(
+      'duplicate seriesOrder',
+    );
   });
 });

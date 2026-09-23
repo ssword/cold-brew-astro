@@ -1,11 +1,13 @@
 ---
 import type { Lifecycle } from '../lib/essays';
+import type { EssayLanguage } from '../lib/i18n';
 
 interface Props {
   status: Lifecycle;
+  lang?: EssayLanguage;
 }
 
-const { status } = Astro.props;
+const { status, lang = 'en' } = Astro.props;
 ---
 
 {
@@ -14,7 +16,7 @@ const { status } = Astro.props;
       class="inline-flex items-center rounded-full border border-sand/25 bg-sand/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-sand"
       data-status="steeping"
     >
-      steeping
+      {lang === 'zh-CN' ? '浸泡中' : 'steeping'}
     </span>
   )
 }

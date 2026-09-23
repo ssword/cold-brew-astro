@@ -3,6 +3,7 @@ title: First light
 excerpt: On the quiet moment a model first begins to see.
 pubDate: 2026-06-01
 status: brewed
+translationKey: first-light
 tags:
   - deep learning
   - training

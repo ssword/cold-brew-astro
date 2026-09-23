@@ -1,0 +1,32 @@
+---
+import { getCollection } from 'astro:content';
+import EssayPage from '../../../components/EssayPage.astro';
+import { publishedEssays } from '../../../lib/essays';
+import {
+  essaySlug,
+  essaysInLanguage,
+  LANGUAGE_INFO,
+  type EssayLanguage,
+} from '../../../lib/i18n';
+
+export async function getStaticPaths() {
+  const { published: allPublished } = publishedEssays(
+    await getCollection('essays'),
+  );
+  const localizedLanguages: EssayLanguage[] = ['zh-CN'];
+
+  return localizedLanguages.flatMap((language) =>
+    essaysInLanguage(allPublished, language).map((essay) => ({
+      params: {
+        lang: LANGUAGE_INFO[language].route,
+        slug: essaySlug(essay),
+      },
+      props: { essay },
+    })),
+  );
+}
+
+const { essay } = Astro.props;
+---
+
+<EssayPage essay={essay} />

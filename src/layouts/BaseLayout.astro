@@ -4,27 +4,76 @@ import '@fontsource-variable/fraunces';
 import '@fontsource-variable/newsreader';
 import '@fontsource-variable/inter';
 import '@fontsource-variable/jetbrains-mono';
+import '@fontsource-variable/noto-serif-sc';
+import '@fontsource-variable/noto-sans-sc';
 import { ClientRouter } from 'astro:transitions';
 import { SITE_TITLE, SITE_TAGLINE, SOCIAL, NAV, REPLY_EMAIL } from '../consts';
 import BaseHead from '../components/BaseHead.astro';
 import CoffeeBeanLogo from '../components/CoffeeBeanLogo.astro';
 import Icon from '../components/Icon.astro';
+import {
+  localeFeed,
+  localeHome,
+  type EssayLanguage,
+  type LanguageAlternate,
+} from '../lib/i18n';
+
+interface ArticleMetadata {
+  publishedTime: Date;
+  modifiedTime?: Date;
+  tags: readonly string[];
+}
 
 interface Props {
   title?: string;
   description?: string;
   image?: string;
   type?: 'website' | 'article';
+  lang?: EssayLanguage;
+  languageAlternates?: readonly LanguageAlternate[];
+  article?: ArticleMetadata;
+  alternateFeeds?: readonly {
+    href: string;
+    title: string;
+  }[];
 }
 
-const { title, description, image, type } = Astro.props;
+const {
+  title,
+  description,
+  image,
+  type,
+  lang = 'en',
+  languageAlternates,
+  article,
+  alternateFeeds,
+} = Astro.props;
+const chinese = lang === 'zh-CN';
+const homeHref = localeHome(lang);
+const feedHref = localeFeed(lang);
+const localizedNav = chinese
+  ? [
+      { label: '文章', href: '/zh/' },
+      { label: '标签', href: '/zh/tags/' },
+      { label: '关于', href: '/about/' },
+    ]
+  : NAV;
 const year = new Date().getFullYear();
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
   <head>
-    <BaseHead title={title} description={description} image={image} type={type} />
+    <BaseHead
+      title={title}
+      description={description}
+      image={image}
+      type={type}
+      lang={lang}
+      languageAlternates={languageAlternates}
+      article={article}
+      alternateFeeds={alternateFeeds}
+    />
     <ClientRouter />
   </head>
   <body class="min-h-screen bg-base text-text font-ui selection:bg-sand/30 selection:text-cream">
@@ -45,16 +94,18 @@ const year = new Date().getFullYear();
     </div>
 
     <header class="flex flex-col items-center text-center pt-12 pb-10 px-5 select-none">
-      <a href="/" class="flex flex-col items-center group" aria-label={SITE_TITLE}>
+      <a href={homeHref} class="flex flex-col items-center group" aria-label={SITE_TITLE}>
         <CoffeeBeanLogo size={46} class="mb-3" />
         <span class="serif-display text-4xl sm:text-5xl font-extralight text-cream tracking-tight lowercase transition-colors group-hover:text-white">
           {SITE_TITLE}
         </span>
       </a>
-      <p class="font-display italic text-sm text-muted mt-2 tracking-wide">{SITE_TAGLINE}</p>
-      <nav class="font-mono text-xs uppercase tracking-widest mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2" aria-label="Primary">
+      <p class="font-display italic text-sm text-muted mt-2 tracking-wide">
+        {chinese ? '让它慢慢浸泡' : SITE_TAGLINE}
+      </p>
+      <nav class="font-mono text-xs uppercase tracking-widest mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2" aria-label={chinese ? '主导航' : 'Primary'}>
         {
-          NAV.map((item) => (
+          localizedNav.map((item) => (
             <a class="text-muted hover:text-sand transition-colors" href={item.href}>
               {item.label}
             </a>
@@ -87,16 +138,18 @@ const year = new Date().getFullYear();
             </div>
           </div>
         </details>
-        <a class="text-muted hover:text-cream transition-colors inline-flex items-center gap-1.5" href="/rss.xml">
+        <a class="text-muted hover:text-cream transition-colors inline-flex items-center gap-1.5" href={feedHref}>
           <Icon name="rss" size={13} /> RSS
         </a>
         <a class="text-sand hover:text-cream transition-colors inline-flex items-center gap-1.5" href={`mailto:${REPLY_EMAIL}`}>
-          <Icon name="arrow-up-right" size={13} /> Reply by email
+          <Icon name="arrow-up-right" size={13} /> {chinese ? '邮件回复' : 'Reply by email'}
         </a>
       </nav>
 
       <div class="flex flex-col items-center gap-1 text-[10px] text-muted/60 text-center">
-        <span class="font-display italic">Read deliberately. Sip slowly. Act considerately.</span>
+        <span class="font-display italic">
+          {chinese ? '认真阅读，慢慢啜饮，体贴行动。' : 'Read deliberately. Sip slowly. Act considerately.'}
+        </span>
         <span>© {year} {SITE_TITLE}</span>
       </div>
     </footer>

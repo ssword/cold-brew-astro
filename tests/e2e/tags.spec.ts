@@ -63,3 +63,20 @@ test('tags on an essay link to their tag pages', async ({ page }) => {
     /\/tags\/training\/?$/,
   );
 });
+
+test('a tag page exposes and advertises its dedicated RSS feed', async ({ page }) => {
+  await page.goto('/tags/language-models/');
+
+  await expect(page.locator('[data-tag-feed]')).toHaveAttribute(
+    'href',
+    '/tags/language-models/rss.xml',
+  );
+  await expect(
+    page.locator(
+      'head link[rel="alternate"][type="application/rss+xml"][title="language models essays — cold brew"]',
+    ),
+  ).toHaveAttribute(
+    'href',
+    'https://coldbrew.live/tags/language-models/rss.xml',
+  );
+});
