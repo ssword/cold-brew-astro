@@ -43,7 +43,7 @@ test('code blocks use the cold-brew Shiki theme', async ({ page }) => {
   const pre = page.locator('article.essay pre').first();
 
   const bg = await pre.evaluate((el) => getComputedStyle(el).backgroundColor);
-  expect(parseRgb(bg)).toEqual([30, 22, 17]); // panel #1E1611
+  expect(parseRgb(bg)).toEqual([27, 19, 17]); // panel #1B1311
 
   const tokenColors = await pre
     .locator('span')
@@ -104,7 +104,7 @@ test('pull-quotes are visually distinct from body text', async ({ page }) => {
     const s = getComputedStyle(el);
     return { borderLeftColor: s.borderLeftColor, borderLeftWidth: s.borderLeftWidth, fontStyle: s.fontStyle };
   });
-  expect(parseRgb(borderLeftColor)).toEqual([217, 145, 74]); // copper #D9914A
+  expect(parseRgb(borderLeftColor)).toEqual([212, 189, 166]); // sand #D4BDA6
   expect(parseFloat(borderLeftWidth)).toBeGreaterThan(0);
   expect(fontStyle).toBe('italic');
 });

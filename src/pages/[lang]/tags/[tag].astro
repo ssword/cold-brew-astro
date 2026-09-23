@@ -1,0 +1,52 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+import {
+  publishedEssays,
+  groupByTag,
+  toDisplayEssays,
+} from '../../../lib/essays';
+import { essaysInLanguage } from '../../../lib/i18n';
+import EssayCard from '../../../components/EssayCard.astro';
+
+export async function getStaticPaths() {
+  const { published: allPublished } = publishedEssays(
+    await getCollection('essays'),
+  );
+  const published = essaysInLanguage(allPublished, 'zh-CN');
+
+  return Promise.all(
+    groupByTag(published).map(async (group) => ({
+      params: { lang: 'zh', tag: group.slug },
+      props: {
+        tag: group.tag,
+        essays: await toDisplayEssays(group.essays, render),
+      },
+    })),
+  );
+}
+
+const { tag, essays } = Astro.props;
+---
+
+<BaseLayout lang="zh-CN" title={tag} description={`带有“${tag}”标签的文章。`}>
+  <section data-tag-page class="mx-auto max-w-2xl pb-16">
+    <div class="mb-10">
+      <h1 class="serif-display text-3xl font-light tracking-tight text-cream">
+        <span class="text-muted">#</span>{tag}
+      </h1>
+    </div>
+    <ul class="space-y-12 sm:space-y-14" data-essay-list>
+      {
+        essays.map(({ essay, href, minutesRead }) => (
+          <EssayCard
+            essay={essay}
+            href={href}
+            minutesRead={minutesRead}
+            variant="list-item"
+          />
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>

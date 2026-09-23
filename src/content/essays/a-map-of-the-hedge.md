@@ -6,6 +6,20 @@ status: brewed
 tags:
   - uncertainty
   - language models
+series: Measuring uncertainty
+seriesOrder: 2
+relatedEssays:
+  - attention-is-not-understanding
+sources:
+  - kind: paper
+    title: A Mathematical Theory of Communication
+    url: https://doi.org/10.1002/j.1538-7305.1948.tb01338.x
+    citation: Claude E. Shannon, Bell System Technical Journal, 1948
+    note: The foundational definition of information entropy used in the essay.
+  - kind: documentation
+    title: torch.nn.functional.softmax
+    url: https://pytorch.org/docs/stable/generated/torch.nn.functional.softmax.html
+    note: Official PyTorch documentation for the operation in the example.
 ---
 
 In an earlier piece I left a claim steeping: that the uncertainty a model

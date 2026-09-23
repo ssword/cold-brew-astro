@@ -1,0 +1,187 @@
+---
+import type { EssayTrail } from '../lib/essays';
+import {
+  localizedEssayHref,
+  type EssayLanguage,
+} from '../lib/i18n';
+
+interface TrailEssay {
+  id: string;
+  data: {
+    title: string;
+    lang?: EssayLanguage;
+    routeSlug?: string;
+  };
+}
+
+interface Props {
+  trail: EssayTrail<TrailEssay>;
+  lang?: EssayLanguage;
+}
+
+const { trail, lang = 'en' } = Astro.props;
+const chinese = lang === 'zh-CN';
+const hasTrail = Boolean(
+  trail.series || trail.previous || trail.next || trail.related.length > 0,
+);
+---
+
+{
+  hasTrail && (
+    <section
+      class="essay-trail"
+      data-essay-trail
+      data-essay-extra
+      aria-labelledby="essay-trail-title"
+    >
+      <div class="essay-trail__head">
+        <h2 id="essay-trail-title" class="essay-trail__title">
+          {trail.series?.title ?? (chinese ? '继续阅读' : 'Continue reading')}
+        </h2>
+        {trail.series && (
+          <p>
+            {chinese
+              ? `第 ${trail.series.position} 篇，共 ${trail.series.total} 篇`
+              : `Part ${trail.series.position} of ${trail.series.total}`}
+          </p>
+        )}
+      </div>
+
+      {(trail.previous || trail.next) && (
+        <nav
+          class="essay-trail__steps"
+          aria-label={chinese ? '系列文章导航' : 'Series navigation'}
+        >
+          {trail.previous && (
+            <a href={localizedEssayHref(trail.previous)} rel="prev" data-trail-previous>
+              <span>{chinese ? '上一篇' : 'Previous'}</span>
+              <strong>{trail.previous.data.title}</strong>
+            </a>
+          )}
+          {trail.next && (
+            <a href={localizedEssayHref(trail.next)} rel="next" data-trail-next>
+              <span>{chinese ? '下一篇' : 'Next'}</span>
+              <strong>{trail.next.data.title}</strong>
+            </a>
+          )}
+        </nav>
+      )}
+
+      {trail.related.length > 0 && (
+        <div class="essay-trail__related">
+          <h3>{chinese ? '相关文章' : 'Related essays'}</h3>
+          <ul>
+            {trail.related.map((essay) => (
+              <li>
+                <a href={localizedEssayHref(essay)}>{essay.data.title}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </section>
+  )
+}
+
+<style>
+  .essay-trail {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-panel);
+  }
+  .essay-trail__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .essay-trail .essay-trail__title {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: var(--text-step-1);
+    font-weight: 400;
+  }
+  .essay-trail__head p {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .essay-trail__steps {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+  .essay-trail__steps a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-height: 5.5rem;
+    padding: 1rem;
+    border: 1px solid color-mix(in srgb, var(--color-muted) 18%, transparent);
+    border-radius: 0.75rem;
+    color: var(--color-cream);
+    text-decoration: none;
+    transition:
+      border-color 0.3s,
+      background-color 0.3s;
+  }
+  .essay-trail__steps a:only-child[rel='next'] {
+    grid-column: 2;
+  }
+  .essay-trail__steps a:hover {
+    border-color: color-mix(in srgb, var(--color-sand) 55%, transparent);
+    background: color-mix(in srgb, var(--color-panel) 35%, transparent);
+  }
+  .essay-trail__steps span {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .essay-trail__steps strong {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.35;
+  }
+  .essay-trail__related {
+    margin-top: 1.5rem;
+  }
+  .essay-trail .essay-trail__related h3 {
+    margin: 0 0 0.65rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .essay-trail__related ul {
+    display: grid;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .essay-trail__related a {
+    color: var(--color-sand);
+    text-underline-offset: 4px;
+  }
+  .essay-trail__related a:hover {
+    text-decoration: underline;
+  }
+  @media (max-width: 520px) {
+    .essay-trail__steps {
+      grid-template-columns: 1fr;
+    }
+    .essay-trail__steps a:only-child[rel='next'] {
+      grid-column: auto;
+    }
+  }
+</style>

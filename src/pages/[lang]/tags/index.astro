@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { publishedEssays, groupByTag } from '../../../lib/essays';
+import {
+  essaysInLanguage,
+  localizedTagHref,
+} from '../../../lib/i18n';
+
+export function getStaticPaths() {
+  return [{ params: { lang: 'zh' } }];
+}
+
+const { published: allPublished } = publishedEssays(
+  await getCollection('essays'),
+);
+const groups = groupByTag(essaysInLanguage(allPublished, 'zh-CN'));
+---
+
+<BaseLayout lang="zh-CN" title="标签" description="按主题浏览文章。">
+  <section data-tag-index class="mx-auto max-w-2xl pb-16">
+    <h1 class="serif-display mb-8 text-3xl font-light tracking-tight text-cream">
+      标签
+    </h1>
+    <ul class="space-y-3">
+      {
+        groups.map((group) => (
+          <li class="flex items-baseline justify-between border-b border-panel/60 pb-3">
+            <a
+              class="serif-display text-xl text-cream transition-colors hover:text-white"
+              href={localizedTagHref(group.slug, 'zh-CN')}
+            >
+              {group.tag}
+            </a>
+            <span class="font-mono text-xs text-muted">{group.essays.length}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>

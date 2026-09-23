@@ -29,7 +29,7 @@ test('a per-tag page lists its essays newest-first, badging only the steeping on
   await expect(page.getByRole('heading', { level: 1, name: 'language models' })).toBeVisible();
 
   const titles = (
-    await page.locator('[data-essay-list] > li a.font-display').allTextContents()
+    await page.locator('[data-essay-list] > li h2 a').allTextContents()
   ).map((t) => t.trim());
 
   // Newest-first: "A map of the hedge" (2026-06-19) before "The long steep" (2026-05-20).
@@ -61,5 +61,22 @@ test('tags on an essay link to their tag pages', async ({ page }) => {
   await expect(tags.getByRole('link', { name: 'training' })).toHaveAttribute(
     'href',
     /\/tags\/training\/?$/,
+  );
+});
+
+test('a tag page exposes and advertises its dedicated RSS feed', async ({ page }) => {
+  await page.goto('/tags/language-models/');
+
+  await expect(page.locator('[data-tag-feed]')).toHaveAttribute(
+    'href',
+    '/tags/language-models/rss.xml',
+  );
+  await expect(
+    page.locator(
+      'head link[rel="alternate"][type="application/rss+xml"][title="language models essays — cold brew"]',
+    ),
+  ).toHaveAttribute(
+    'href',
+    'https://coldbrew.live/tags/language-models/rss.xml',
   );
 });

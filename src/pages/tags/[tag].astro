@@ -2,26 +2,51 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection, render } from 'astro:content';
 import { publishedEssays, groupByTag, toDisplayEssays } from '../../lib/essays';
+import { essaysInLanguage } from '../../lib/i18n';
 import EssayCard from '../../components/EssayCard.astro';
+import Icon from '../../components/Icon.astro';
 
 export async function getStaticPaths() {
-  const { published } = publishedEssays(await getCollection('essays'));
+  const { published: allPublished } = publishedEssays(await getCollection('essays'));
+  const published = essaysInLanguage(allPublished, 'en');
   return Promise.all(
     groupByTag(published).map(async (group) => {
       const essays = await toDisplayEssays(group.essays, render);
-      return { params: { tag: group.slug }, props: { tag: group.tag, essays } };
+      return {
+        params: { tag: group.slug },
+        props: { tag: group.tag, slug: group.slug, essays },
+      };
     }),
   );
 }
 
-const { tag, essays } = Astro.props;
+const { tag, slug, essays } = Astro.props;
 ---
 
-<BaseLayout title={tag} description={`Essays tagged ${tag}.`}>
+<BaseLayout
+  title={tag}
+  description={`Essays tagged ${tag}.`}
+  alternateFeeds={[
+    {
+      href: `/tags/${slug}/rss.xml`,
+      title: `${tag} essays — cold brew`,
+    },
+  ]}
+>
   <section data-tag-page class="mx-auto max-w-2xl pb-16">
-    <h1 class="serif-display mb-10 text-3xl font-light tracking-tight text-cream">
-      <span class="text-muted">#</span>{tag}
-    </h1>
+    <div class="tag-head">
+      <h1 class="serif-display text-3xl font-light tracking-tight text-cream">
+        <span class="text-muted">#</span>{tag}
+      </h1>
+      <a
+        class="tag-feed"
+        href={`/tags/${slug}/rss.xml`}
+        data-tag-feed
+        aria-label={`RSS feed for ${tag}`}
+      >
+        <Icon name="rss" size={13} /> RSS
+      </a>
+    </div>
     <ul class="space-y-12 sm:space-y-14" data-essay-list>
       {
         essays.map(({ essay, href, minutesRead }) => (
@@ -31,3 +56,27 @@ const { tag, essays } = Astro.props;
     </ul>
   </section>
 </BaseLayout>
+
+<style>
+  .tag-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+  .tag-feed {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    transition: color 0.3s;
+  }
+  .tag-feed:hover {
+    color: var(--color-sand);
+  }
+</style>

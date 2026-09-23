@@ -19,9 +19,9 @@
      so a self-hosted Chinese face can be prepended later without reworking it.
      Display + body stay serif (Fraunces / Newsreader); UI is Inter; metadata,
      tags, and badges are JetBrains Mono. */
-  --font-display: "Fraunces Variable", "Noto Serif SC", "Songti SC", Georgia, serif;
-  --font-body: "Newsreader Variable", "Noto Serif SC", "Songti SC", Georgia, "Times New Roman", serif;
-  --font-ui: "Inter Variable", "Noto Sans SC", "PingFang SC", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces Variable", "Noto Serif SC Variable", "Noto Serif SC", "Songti SC", Georgia, serif;
+  --font-body: "Newsreader Variable", "Noto Serif SC Variable", "Noto Serif SC", "Songti SC", Georgia, "Times New Roman", serif;
+  --font-ui: "Inter Variable", "Noto Sans SC Variable", "Noto Sans SC", "PingFang SC", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, monospace;
 
   /* Type scale. */
@@ -38,12 +38,14 @@
   --container-wide: 80ch;
 }
 
-@layer base {
-  /* Visible keyboard focus everywhere. */
-  :focus-visible {
-    outline: 2px solid var(--color-sand);
-    outline-offset: 2px;
-  }
+/* Visible keyboard focus everywhere. Kept unlayered (not in @layer base) so it
+   outranks Tailwind's utilities layer. `transition: none` makes the ring appear
+   instantly: Tailwind v4's `transition-colors` animates outline-color, which
+   would otherwise fade the ring in from currentColor on focus. */
+:focus-visible {
+  outline: 2px solid var(--color-sand);
+  outline-offset: 2px;
+  transition: none;
 }
 
 /* The base font is Inter (UI); serif is applied to the prose surfaces only.

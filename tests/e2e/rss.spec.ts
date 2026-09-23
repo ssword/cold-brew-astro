@@ -34,3 +34,35 @@ test('feed items link to canonical essay URLs', async ({ request }) => {
   const xml = await getFeed(request);
   expect(xml).toContain('https://coldbrew.live/essays/first-light/');
 });
+
+test('the main feed contains complete rendered essays, categories, and revision dates', async ({
+  request,
+}) => {
+  const xml = await getFeed(request);
+
+  expect(xml).toContain('<content:encoded>');
+  expect(xml).toContain('In an earlier piece I left a claim steeping');
+  expect(xml).toContain('astro-code');
+  expect(xml).toContain('<category>uncertainty</category>');
+  expect(xml).toContain(
+    '<atom:updated>2026-07-30T00:00:00.000Z</atom:updated>',
+  );
+});
+
+test('a per-tag feed contains only that tag’s essays in newest-first order', async ({
+  request,
+}) => {
+  const res = await request.get('/tags/language-models/rss.xml');
+  expect(res.status()).toBe(200);
+  expect(res.headers()['content-type']).toContain('xml');
+  const xml = await res.text();
+
+  expect(xml).toContain('A map of the hedge');
+  expect(xml).toContain('The long steep');
+  expect(xml).not.toContain('First light');
+  expect(xml).toContain('<content:encoded>');
+
+  expect(xml.indexOf('A map of the hedge')).toBeLessThan(
+    xml.indexOf('The long steep'),
+  );
+});

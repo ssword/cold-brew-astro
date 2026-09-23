@@ -13,7 +13,7 @@ test('the Now page is a dated snapshot in the shared layout and voice', async ({
   // a dated snapshot: a muted "last updated" timestamp in the UI font
   const updated = page.locator('article.page .updated');
   await expect(updated).toContainText(/last updated/i);
-  expect(await updated.evaluate((el) => getComputedStyle(el).fontFamily)).toMatch(/IBM Plex Sans/);
+  expect(await updated.evaluate((el) => getComputedStyle(el).fontFamily)).toMatch(/Inter/);
 
   // reads like a person, in the shared reading serif
   await expect(page.locator('article.page')).toContainText(/\bI\b/);

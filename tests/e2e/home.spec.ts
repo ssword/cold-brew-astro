@@ -36,7 +36,7 @@ test('lists the remaining essays newest-first, excluding the featured one', asyn
 
   // The rest of the published corpus surfaces here (the set may grow or shrink;
   // we assert ordering behavior, not a fixed list of titles).
-  const titles = (await list.locator('li > a').allTextContents()).map((t) => t.trim());
+  const titles = (await list.locator('li h2 a').allTextContents()).map((t) => t.trim());
   expect(titles.length).toBeGreaterThan(1);
 
   // Newest-first: First light (2026-06-01) precedes The long steep (2026-05-20).
