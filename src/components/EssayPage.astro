@@ -24,7 +24,7 @@ import Icon from './Icon.astro';
 import RevisionLedger from './RevisionLedger.astro';
 import EssayTrail from './EssayTrail.astro';
 import TechnicalSources from './TechnicalSources.astro';
-import { REPLY_EMAIL } from '../consts';
+import { AUTHOR, REPLY_EMAIL, SITE_TITLE } from '../consts';
 import { socialCardHref } from '../lib/social-card';
 import 'katex/dist/katex.min.css';
 
@@ -42,6 +42,9 @@ const { published } = publishedEssays(await getCollection('essays'));
 const trail = buildEssayTrail(essay, published);
 const translations = languageAlternates(essay, published);
 const date = formatEssayDate(essay.data.pubDate, lang);
+// Printed copies lose the masthead, so they carry the site, author, and
+// canonical address in a print-only line instead.
+const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.href;
 const updatedDate = essay.data.updatedDate
   ? formatEssayDate(essay.data.updatedDate, lang)
   : undefined;
@@ -65,6 +68,9 @@ const updatedDate = essay.data.updatedDate
 
   <article class="essay" data-essay>
     <header class="essay-head">
+      <p class="print-identity font-mono" data-print-identity>
+        {SITE_TITLE} · {AUTHOR.name} · {canonicalUrl}
+      </p>
       <div class="essay-meta font-mono">
         <BrewBadge brew={essay.data.brew} lang={lang} showSubtitle={true} />
         <span>{date}</span>
@@ -192,6 +198,17 @@ const updatedDate = essay.data.updatedDate
 
   .essay-head {
     margin-bottom: 3rem;
+  }
+  .print-identity {
+    display: none;
+  }
+  @media print {
+    .print-identity {
+      display: block;
+      margin-bottom: 0.75rem;
+      font-size: 8pt;
+      letter-spacing: 0.05em;
+    }
   }
   .essay-meta {
     display: flex;

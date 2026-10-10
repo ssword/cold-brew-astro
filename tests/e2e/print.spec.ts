@@ -86,4 +86,28 @@ test.describe('print media', () => {
     const [r, g, b] = parseRgb(ink);
     expect(Math.max(r, g, b)).toBeLessThan(60);
   });
+
+  for (const path of [ESSAY, ZH_ESSAY]) {
+    test(`printed ${path} names the site and author alongside the title`, async ({ page }) => {
+      await page.goto(path);
+      const identity = page.locator('[data-print-identity]');
+      await expect(identity).toBeVisible();
+      await expect(identity).toContainText('Kaffeeklatsch');
+      await expect(identity).toContainText('ssword');
+      await expect(page.locator('article.essay h1')).toBeVisible();
+    });
+  }
+
+  test('printed essay keeps its publication and revision dates', async ({ page }) => {
+    await page.goto('/essays/the-long-steep/');
+    const meta = page.locator('.essay-meta');
+    await expect(meta).toBeVisible();
+    await expect(meta).toContainText('2026');
+    await expect(page.locator('[data-last-revised]')).toBeVisible();
+  });
+});
+
+test('the print identity line stays off the screen layout', async ({ page }) => {
+  await page.goto(ESSAY);
+  await expect(page.locator('[data-print-identity]')).toBeHidden();
 });
