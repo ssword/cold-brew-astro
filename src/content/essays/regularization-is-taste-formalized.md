@@ -3,6 +3,7 @@ title: Regularization is taste, formalized
 excerpt: Every penalty term is a sentence about what a good answer should look like before you have seen the data.
 pubDate: 2026-02-12
 status: steeping
+brew: affogato
 tags:
   - regularization
   - generalization

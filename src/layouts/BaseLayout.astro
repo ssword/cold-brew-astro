@@ -6,8 +6,12 @@ import '@fontsource-variable/inter';
 import '@fontsource-variable/jetbrains-mono';
 import '@fontsource-variable/noto-serif-sc';
 import '@fontsource-variable/noto-sans-sc';
+import '@fontsource/permanent-marker';
+import '@fontsource/caveat';
+import '@fontsource/rock-salt';
 import { ClientRouter } from 'astro:transitions';
-import { SITE_TITLE, SITE_TAGLINE, SOCIAL, NAV, REPLY_EMAIL } from '../consts';
+import { SITE_TITLE, SOCIAL, NAV, REPLY_EMAIL } from '../consts';
+import { uiStrings } from '../lib/ui-strings';
 import BaseHead from '../components/BaseHead.astro';
 import CoffeeBeanLogo from '../components/CoffeeBeanLogo.astro';
 import Icon from '../components/Icon.astro';
@@ -49,6 +53,7 @@ const {
   alternateFeeds,
 } = Astro.props;
 const chinese = lang === 'zh-CN';
+const t = uiStrings(lang);
 const homeHref = localeHome(lang);
 const feedHref = localeFeed(lang);
 const localizedNav = chinese
@@ -94,16 +99,19 @@ const year = new Date().getFullYear();
     </div>
 
     <header class="flex flex-col items-center text-center pt-12 pb-10 px-5 select-none">
-      <a href={homeHref} class="flex flex-col items-center group" aria-label={SITE_TITLE}>
-        <CoffeeBeanLogo size={46} class="mb-3" />
-        <span class="serif-display text-4xl sm:text-5xl font-extralight text-cream tracking-tight lowercase transition-colors group-hover:text-white">
+      <a href={homeHref} class="flex flex-col items-center group relative" aria-label={SITE_TITLE}>
+        <CoffeeBeanLogo size={46} class="mb-3 transition-transform duration-300" />
+        <span class="font-wild text-4xl sm:text-6xl text-cream tracking-wide transition-all duration-300 group-hover:text-white -rotate-1 sm:-rotate-2 group-hover:rotate-0 inline-block drop-shadow-[0_4px_16px_rgba(217,145,74,0.3)] group-hover:drop-shadow-[0_6px_24px_rgba(217,145,74,0.5)]">
           {SITE_TITLE}
         </span>
+        <svg class="w-40 sm:w-56 h-3 text-copper/60 mt-1 transition-all duration-300 group-hover:text-copper group-hover:scale-105" viewBox="0 0 200 12" fill="none" aria-hidden="true">
+          <path d="M5,7 C45,1 75,11 115,5 C145,1 175,9 195,6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+        </svg>
       </a>
-      <p class="font-display italic text-sm text-muted mt-2 tracking-wide">
-        {chinese ? '让它慢慢浸泡' : SITE_TAGLINE}
+      <p class="font-casual text-base sm:text-lg text-sand/85 mt-2.5 tracking-wide italic transition-colors">
+        {t.tagline}
       </p>
-      <nav class="font-mono text-xs uppercase tracking-widest mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2" aria-label={chinese ? '主导航' : 'Primary'}>
+      <nav class="font-mono text-xs uppercase tracking-widest mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2" aria-label={t.primaryNav}>
         {
           localizedNav.map((item) => (
             <a class="text-muted hover:text-sand transition-colors" href={item.href}>
@@ -142,13 +150,13 @@ const year = new Date().getFullYear();
           <Icon name="rss" size={13} /> RSS
         </a>
         <a class="text-sand hover:text-cream transition-colors inline-flex items-center gap-1.5" href={`mailto:${REPLY_EMAIL}`}>
-          <Icon name="arrow-up-right" size={13} /> {chinese ? '邮件回复' : 'Reply by email'}
+          <Icon name="arrow-up-right" size={13} /> {t.replyByEmail}
         </a>
       </nav>
 
       <div class="flex flex-col items-center gap-1 text-[10px] text-muted/60 text-center">
         <span class="font-display italic">
-          {chinese ? '认真阅读，慢慢啜饮，体贴行动。' : 'Read deliberately. Sip slowly. Act considerately.'}
+          {t.footerMotto}
         </span>
         <span>© {year} {SITE_TITLE}</span>
       </div>

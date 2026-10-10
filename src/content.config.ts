@@ -2,6 +2,7 @@ import { defineCollection, reference } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { ESSAY_LANGUAGES } from './lib/i18n';
+import { BREW_TYPES, SOURCE_KINDS } from './lib/essays';
 
 const revision = z.object({
   date: z.coerce.date(),
@@ -9,14 +10,7 @@ const revision = z.object({
 });
 
 const technicalSource = z.object({
-  kind: z.enum([
-    'paper',
-    'code',
-    'notebook',
-    'dataset',
-    'documentation',
-    'article',
-  ]),
+  kind: z.enum(SOURCE_KINDS),
   title: z.string().min(1),
   url: z.url(),
   note: z.string().min(1).optional(),
@@ -33,6 +27,7 @@ const essays = defineCollection({
       updatedDate: z.coerce.date().optional(),
       revisions: z.array(revision).default([]),
       status: z.enum(['draft', 'steeping', 'brewed']),
+      brew: z.enum(BREW_TYPES).default('cold-brew'),
       tags: z.array(z.string()).default([]),
       lang: z.enum(ESSAY_LANGUAGES).default('en'),
       routeSlug: z

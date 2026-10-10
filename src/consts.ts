@@ -1,5 +1,5 @@
-export const SITE_TITLE = 'cold brew';
-export const SITE_TAGLINE = 'let it steep';
+export const SITE_TITLE = 'Kaffeeklatsch';
+export const SITE_TAGLINE = 'coffee & conversations · let it steep';
 export const SITE_DESCRIPTION =
   'a home for slow, considered writing on deep learning, language models, and statistics — the kind of thinking that shouldn’t be rushed.';
 
@@ -13,7 +13,13 @@ export const TWITTER_HANDLE = '@sswordme';
 
 export const SOCIAL = {
   github: 'https://github.com/ssword',
-  twitter: 'https://twitter.com/sswordme',
+  twitter: `https://twitter.com/${TWITTER_HANDLE.slice(1)}`,
+} as const;
+
+// The byline used in Article structured data.
+export const AUTHOR = {
+  name: 'ssword',
+  url: SOCIAL.github,
 } as const;
 
 export const NAV = [

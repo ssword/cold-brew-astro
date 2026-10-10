@@ -1,0 +1,23 @@
+---
+import { BREW_VESSELS, type BrewType } from '../lib/essays';
+import type { EssayLanguage } from '../lib/i18n';
+
+interface Props {
+  brew?: BrewType;
+  lang?: EssayLanguage;
+  showSubtitle?: boolean;
+}
+
+const { brew = 'cold-brew', lang = 'en', showSubtitle = false } = Astro.props;
+const vessel = BREW_VESSELS[brew];
+const name = vessel.name[lang] ?? vessel.name.en;
+const subtitle = vessel.subtitle[lang] ?? vessel.subtitle.en;
+---
+
+<span
+  class={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider ${vessel.badgeBorder} ${vessel.badgeBg} ${vessel.badgeText}`}
+  data-brew-badge={brew}
+>
+  <span>{name}</span>
+  {showSubtitle && <span class="opacity-60">· {subtitle}</span>}
+</span>

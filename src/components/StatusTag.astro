@@ -1,6 +1,7 @@
 ---
 import type { Lifecycle } from '../lib/essays';
 import type { EssayLanguage } from '../lib/i18n';
+import { uiStrings } from '../lib/ui-strings';
 
 interface Props {
   status: Lifecycle;
@@ -16,7 +17,7 @@ const { status, lang = 'en' } = Astro.props;
       class="inline-flex items-center rounded-full border border-sand/25 bg-sand/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-sand"
       data-status="steeping"
     >
-      {lang === 'zh-CN' ? '浸泡中' : 'steeping'}
+      {uiStrings(lang).steeping}
     </span>
   )
 }

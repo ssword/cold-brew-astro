@@ -4,6 +4,7 @@ import {
   localizedEssayHref,
   type EssayLanguage,
 } from '../lib/i18n';
+import { uiStrings } from '../lib/ui-strings';
 
 interface TrailEssay {
   id: string;
@@ -20,7 +21,7 @@ interface Props {
 }
 
 const { trail, lang = 'en' } = Astro.props;
-const chinese = lang === 'zh-CN';
+const t = uiStrings(lang);
 const hasTrail = Boolean(
   trail.series || trail.previous || trail.next || trail.related.length > 0,
 );
@@ -36,13 +37,11 @@ const hasTrail = Boolean(
     >
       <div class="essay-trail__head">
         <h2 id="essay-trail-title" class="essay-trail__title">
-          {trail.series?.title ?? (chinese ? '继续阅读' : 'Continue reading')}
+          {trail.series?.title ?? t.continueReading}
         </h2>
         {trail.series && (
           <p>
-            {chinese
-              ? `第 ${trail.series.position} 篇，共 ${trail.series.total} 篇`
-              : `Part ${trail.series.position} of ${trail.series.total}`}
+            {t.seriesPosition(trail.series.position, trail.series.total)}
           </p>
         )}
       </div>
@@ -50,17 +49,17 @@ const hasTrail = Boolean(
       {(trail.previous || trail.next) && (
         <nav
           class="essay-trail__steps"
-          aria-label={chinese ? '系列文章导航' : 'Series navigation'}
+          aria-label={t.seriesNavigation}
         >
           {trail.previous && (
             <a href={localizedEssayHref(trail.previous)} rel="prev" data-trail-previous>
-              <span>{chinese ? '上一篇' : 'Previous'}</span>
+              <span>{t.previous}</span>
               <strong>{trail.previous.data.title}</strong>
             </a>
           )}
           {trail.next && (
             <a href={localizedEssayHref(trail.next)} rel="next" data-trail-next>
-              <span>{chinese ? '下一篇' : 'Next'}</span>
+              <span>{t.next}</span>
               <strong>{trail.next.data.title}</strong>
             </a>
           )}
@@ -69,7 +68,7 @@ const hasTrail = Boolean(
 
       {trail.related.length > 0 && (
         <div class="essay-trail__related">
-          <h3>{chinese ? '相关文章' : 'Related essays'}</h3>
+          <h3>{t.relatedEssays}</h3>
           <ul>
             {trail.related.map((essay) => (
               <li>

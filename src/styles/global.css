@@ -14,6 +14,7 @@
   --color-text: #e8ded4;
   --color-sand: #d4bda6;
   --color-muted: #9e8774;
+  --color-copper: #d9914a;
 
   /* Font roles. Each chain keeps a CJK fallback slot before the generic family,
      so a self-hosted Chinese face can be prepended later without reworking it.
@@ -23,6 +24,8 @@
   --font-body: "Newsreader Variable", "Noto Serif SC Variable", "Noto Serif SC", "Songti SC", Georgia, "Times New Roman", serif;
   --font-ui: "Inter Variable", "Noto Sans SC Variable", "Noto Sans SC", "PingFang SC", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, monospace;
+  --font-wild: "Permanent Marker", "Rock Salt", "Caveat", cursive, sans-serif;
+  --font-casual: "Caveat", "Permanent Marker", cursive, sans-serif;
 
   /* Type scale. */
   --text-step--1: 0.875rem;
@@ -415,4 +418,71 @@ body {
   font-size: var(--text-step-1);
   line-height: 1.5;
   color: var(--color-cream);
+}
+
+/* Print: ink on paper. The dark palette, atmosphere, and reader controls are
+   dropped; the essay keeps its math, figures, footnotes, sources, and revision
+   notes. Code blocks keep their Shiki theme (print-color-adjust) because the
+   token colours are only legible on the dark background they were tuned for. */
+@media print {
+  @page {
+    margin: 2cm 2.2cm;
+  }
+
+  :where(*:not(pre, pre *)) {
+    color: #1b1512 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  body {
+    background: #fff !important;
+    font-size: 11pt;
+  }
+
+  [data-atmosphere],
+  body > header,
+  body > footer,
+  .reader-progress,
+  .reader-dock,
+  [data-ambient],
+  .tasting-menu,
+  .essay-languages,
+  .essay-trail,
+  .essay-reply {
+    display: none !important;
+  }
+
+  .essay,
+  .essay > *,
+  .page {
+    max-width: none;
+    padding-inline: 0;
+  }
+
+  /* External links carry their destination onto paper. */
+  .essay a[href^='http']::after,
+  .page a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.8em;
+    word-break: break-all;
+  }
+
+  .essay pre {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    white-space: pre-wrap;
+  }
+
+  .essay :is(h1, h2, h3) {
+    break-after: avoid;
+  }
+  .essay :is(pre, figure, table, blockquote, .katex-display, li) {
+    break-inside: avoid;
+  }
+  .essay p {
+    orphans: 3;
+    widows: 3;
+  }
 }

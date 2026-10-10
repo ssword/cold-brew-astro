@@ -21,6 +21,6 @@ test('the Now page is a dated snapshot in the shared layout and voice', async ({
   expect(await para.evaluate((el) => getComputedStyle(el).fontFamily)).toMatch(/Newsreader/);
 
   // shared layout
-  await expect(page.getByRole('link', { name: 'cold brew' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Kaffeeklatsch' })).toBeVisible();
   await expect(page.locator('footer')).toBeVisible();
 });

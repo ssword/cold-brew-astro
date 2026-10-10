@@ -5,6 +5,7 @@ import { publishedEssays, toDisplayEssays } from '../lib/essays';
 import { essaysInLanguage } from '../lib/i18n';
 import EssayCard from '../components/EssayCard.astro';
 import AmbientCafe from '../components/AmbientCafe.astro';
+import TastingMenu from '../components/TastingMenu.astro';
 import { SITE_DESCRIPTION, SITE_TAGLINE } from '../consts';
 
 const { published: allPublished } = publishedEssays(await getCollection('essays'));
@@ -23,6 +24,8 @@ const [featured, ...rest] = await toDisplayEssays(published, render);
       <p class="font-body text-lg italic leading-relaxed text-muted">{SITE_DESCRIPTION}</p>
       <p class="font-mono text-xs uppercase tracking-widest text-sand mt-4">{SITE_TAGLINE}</p>
     </section>
+
+    <TastingMenu lang="en" />
 
     <div class="space-y-12 sm:space-y-14">
       {featured && (

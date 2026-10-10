@@ -1,0 +1,160 @@
+---
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { BREW_VESSELS, type BrewType } from '../lib/essays';
+import type { EssayLanguage } from '../lib/i18n';
+import { uiStrings } from '../lib/ui-strings';
+import coldBrewImage from '../assets/vessels/cold-brew.jpg';
+import espressoImage from '../assets/vessels/espresso.jpg';
+import cappuccinoImage from '../assets/vessels/cappuccino.jpg';
+import affogatoImage from '../assets/vessels/affogato.jpg';
+
+interface Props {
+  lang?: EssayLanguage;
+}
+
+const { lang = 'en' } = Astro.props;
+const t = uiStrings(lang);
+
+const vessels = Object.values(BREW_VESSELS);
+
+// Vessel photos are imported (not served from public/) so Astro can emit
+// resized AVIF/WebP variants instead of the 1200px source JPEGs.
+const VESSEL_IMAGES: Record<BrewType, ImageMetadata> = {
+  'cold-brew': coldBrewImage,
+  espresso: espressoImage,
+  cappuccino: cappuccinoImage,
+  affogato: affogatoImage,
+};
+---
+
+<section class="tasting-menu mb-12 sm:mb-16" aria-label={t.tastingMenu}>
+  <div class="mb-4 flex items-center justify-between border-b border-sand/15 pb-2">
+    <span class="font-mono text-xs uppercase tracking-widest text-muted">
+      {t.tastingMenuHeading}
+    </span>
+    <span class="font-mono text-[11px] text-sand/60" data-filter-indicator>
+      {t.allBrews}
+    </span>
+  </div>
+
+  <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4" role="group" aria-label={t.filterByBrew}>
+    {
+      vessels.map((v) => (
+        <button
+          type="button"
+          aria-pressed="false"
+          data-filter-brew={v.id}
+          class="tasting-card group relative flex flex-col overflow-hidden rounded-lg border border-sand/20 bg-panel/60 p-3 text-left transition-all duration-300 hover:border-sand/40 hover:bg-panel"
+        >
+          <div class="relative mb-2.5 aspect-4/3 w-full overflow-hidden rounded bg-base">
+            <Picture
+              src={VESSEL_IMAGES[v.id]}
+              formats={['avif', 'webp']}
+              width={480}
+              widths={[240, 360, 480]}
+              sizes="(min-width: 640px) 180px, 45vw"
+              alt=""
+              loading="lazy"
+              class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-base/80 via-transparent to-transparent opacity-80" />
+            <span
+              class={`absolute bottom-1.5 left-1.5 rounded-full border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider ${v.badgeBorder} ${v.badgeBg} ${v.badgeText}`}
+            >
+              {v.name[lang]}
+            </span>
+          </div>
+
+          <div class="mt-auto">
+            <h3 class="serif-display text-sm font-medium text-cream group-hover:text-white">
+              {v.name[lang]}
+            </h3>
+            <p class="font-mono text-[10px] text-muted group-hover:text-sand/80">
+              {v.subtitle[lang]}
+            </p>
+          </div>
+        </button>
+      ))
+    }
+  </div>
+
+  <div class="mt-3 flex items-center justify-end">
+    <button
+      type="button"
+      data-filter-reset
+      class="hidden font-mono text-xs text-sand/70 underline underline-offset-4 transition-colors hover:text-cream"
+    >
+      {t.resetFilter}
+    </button>
+  </div>
+</section>
+
+<script>
+  function setupTastingFilter() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-filter-brew]');
+    const resetBtn = document.querySelector<HTMLButtonElement>('[data-filter-reset]');
+    const indicator = document.querySelector<HTMLElement>('[data-filter-indicator]');
+    const essayCards = document.querySelectorAll<HTMLElement>('[data-brew]');
+    let activeFilter: string | null = null;
+
+    function applyFilter(brew: string | null) {
+      activeFilter = brew;
+
+      buttons.forEach((btn) => {
+        const isMatch = btn.dataset.filterBrew === brew;
+        btn.setAttribute('aria-pressed', isMatch ? 'true' : 'false');
+        btn.classList.toggle('ring-1', isMatch);
+        btn.classList.toggle('ring-sand', isMatch);
+      });
+
+      let visibleCount = 0;
+      essayCards.forEach((card) => {
+        const cardBrew = card.dataset.brew;
+        const matches = !brew || cardBrew === brew;
+        card.style.display = matches ? '' : 'none';
+        if (matches) visibleCount++;
+      });
+
+      if (resetBtn) {
+        resetBtn.classList.toggle('hidden', !brew);
+      }
+
+      if (indicator) {
+        if (!brew) {
+          indicator.textContent = indicator.dataset.defaultText || indicator.textContent;
+        } else {
+          indicator.textContent = `(${visibleCount})`;
+        }
+      }
+    }
+
+    if (indicator && !indicator.dataset.defaultText) {
+      indicator.dataset.defaultText = indicator.textContent || '';
+    }
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const brew = btn.dataset.filterBrew;
+        if (activeFilter === brew) {
+          applyFilter(null);
+        } else {
+          applyFilter(brew || null);
+        }
+      });
+    });
+
+    resetBtn?.addEventListener('click', () => applyFilter(null));
+  }
+
+  // `astro:page-load` fires on the initial load as well as after every
+  // ClientRouter navigation, so this is the only initialization needed.
+  document.addEventListener('astro:page-load', setupTastingFilter);
+</script>
+
+<style>
+  .tasting-card[aria-pressed='true'] {
+    border-color: var(--color-sand);
+    background-color: var(--color-panel);
+  }
+</style>
