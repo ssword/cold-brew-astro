@@ -1,0 +1,9 @@
+---
+import SearchPage from '../../components/SearchPage.astro';
+
+export function getStaticPaths() {
+  return [{ params: { lang: 'zh' } }];
+}
+---
+
+<SearchPage lang="zh-CN" description="在已发布的文章中搜索标题、摘要、标签或正文。" />

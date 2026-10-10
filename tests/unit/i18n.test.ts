@@ -4,7 +4,12 @@ import {
   formatEssayDate,
   essaysInLanguage,
   languageAlternates,
+  localeFeed,
+  localeHome,
+  localeSearch,
+  localeTagsIndex,
   localizedEssayHref,
+  localizedTagHref,
 } from '../../src/lib/i18n';
 
 const entry = (
@@ -34,6 +39,24 @@ describe('localized essay URLs', () => {
     const translated = entry('first-light-zh', 'zh-CN', 'first-light');
     expect(essaySlug(translated)).toBe('first-light');
     expect(translated.id).toBe('first-light-zh');
+  });
+});
+
+describe('locale page paths', () => {
+  it('leaves English pages unprefixed and puts Chinese ones under /zh/', () => {
+    expect([localeHome('en'), localeFeed('en'), localeTagsIndex('en'), localeSearch('en')]).toEqual([
+      '/',
+      '/rss.xml',
+      '/tags/',
+      '/search/',
+    ]);
+    expect([
+      localeHome('zh-CN'),
+      localeFeed('zh-CN'),
+      localeTagsIndex('zh-CN'),
+      localeSearch('zh-CN'),
+    ]).toEqual(['/zh/', '/zh/rss.xml', '/zh/tags/', '/zh/search/']);
+    expect(localizedTagHref('statistics', 'zh-CN')).toBe('/zh/tags/statistics/');
   });
 });
 

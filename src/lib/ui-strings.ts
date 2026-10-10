@@ -23,6 +23,7 @@ export interface UiStrings {
   focus: string;
   exitFocus: string;
   shareEssay: string;
+  printEssay: string;
 
   revisionNotes: string;
 
@@ -42,6 +43,14 @@ export interface UiStrings {
   allBrews: string;
   filterByBrew: string;
   resetFilter: string;
+
+  search: string;
+  searchLabel: string;
+  searchResults: string;
+  searchEmpty: string;
+  searchNoResults: (query: string) => string;
+  searchResultCount: (count: number) => string;
+  browseByTag: string;
 }
 
 const en: UiStrings = {
@@ -62,6 +71,7 @@ const en: UiStrings = {
   focus: 'Focus',
   exitFocus: 'Exit focus',
   shareEssay: 'Share this essay',
+  printEssay: 'Print or save as PDF',
 
   revisionNotes: 'Revision notes',
 
@@ -88,6 +98,17 @@ const en: UiStrings = {
   allBrews: 'All brews',
   filterByBrew: 'Filter essays by brew',
   resetFilter: 'Reset to show all',
+
+  search: 'Search',
+  searchLabel: 'Search essays',
+  searchResults: 'Search results',
+  searchEmpty:
+    'Type a word or phrase from an essay: its title, excerpt, tags, or text. Your query stays in this browser.',
+  searchNoResults: (query) =>
+    `Nothing matches “${query}”. Try a shorter word, or browse by tag.`,
+  searchResultCount: (count) =>
+    count === 1 ? '1 essay found' : `${count} essays found`,
+  browseByTag: 'Browse by tag',
 };
 
 const zhCN: UiStrings = {
@@ -108,6 +129,7 @@ const zhCN: UiStrings = {
   focus: '专注',
   exitFocus: '退出专注',
   shareEssay: '分享这篇文章',
+  printEssay: '打印或存为 PDF',
 
   revisionNotes: '修订记录',
 
@@ -134,6 +156,14 @@ const zhCN: UiStrings = {
   allBrews: '全部文章',
   filterByBrew: '按萃取方式筛选',
   resetFilter: '重置并查看全部',
+
+  search: '搜索',
+  searchLabel: '搜索文章',
+  searchResults: '搜索结果',
+  searchEmpty: '输入文章中的词语或短语：标题、摘要、标签或正文均可。搜索只在本浏览器中进行。',
+  searchNoResults: (query) => `没有与“${query}”匹配的文章。试试更短的词，或按标签浏览。`,
+  searchResultCount: (count) => `找到 ${count} 篇文章`,
+  browseByTag: '按标签浏览',
 };
 
 const UI_STRINGS: Record<EssayLanguage, UiStrings> = { en, 'zh-CN': zhCN };

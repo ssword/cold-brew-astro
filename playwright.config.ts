@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const PORT = 4321;
+// E2E_PORT lets parallel worktrees run the suite without reusing each other's server.
+const PORT = Number(process.env.E2E_PORT ?? 4321);
 const BASE_URL = `http://localhost:${PORT}`;
 
 // E2E runs against the production build served by `astro preview`, so tests
@@ -17,7 +18,7 @@ export default defineConfig({
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
-    command: 'npm run build && npm run preview',
+    command: `npm run build && npm run preview -- --port ${PORT}`,
     url: BASE_URL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

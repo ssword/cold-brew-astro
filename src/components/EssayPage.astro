@@ -17,6 +17,7 @@ import {
   languageOf,
   localizedTagHref,
 } from '../lib/i18n';
+import { canonicalUrl } from '../lib/canonical';
 import { uiStrings } from '../lib/ui-strings';
 import StatusTag from './StatusTag.astro';
 import BrewBadge from './BrewBadge.astro';
@@ -24,7 +25,7 @@ import Icon from './Icon.astro';
 import RevisionLedger from './RevisionLedger.astro';
 import EssayTrail from './EssayTrail.astro';
 import TechnicalSources from './TechnicalSources.astro';
-import { REPLY_EMAIL } from '../consts';
+import { AUTHOR, REPLY_EMAIL, SITE_TITLE } from '../consts';
 import { socialCardHref } from '../lib/social-card';
 import 'katex/dist/katex.min.css';
 
@@ -42,6 +43,9 @@ const { published } = publishedEssays(await getCollection('essays'));
 const trail = buildEssayTrail(essay, published);
 const translations = languageAlternates(essay, published);
 const date = formatEssayDate(essay.data.pubDate, lang);
+// Printed copies lose the masthead, so they carry the site, author, and
+// canonical address in a print-only line instead.
+const canonical = canonicalUrl(Astro);
 const updatedDate = essay.data.updatedDate
   ? formatEssayDate(essay.data.updatedDate, lang)
   : undefined;
@@ -63,8 +67,15 @@ const updatedDate = essay.data.updatedDate
   <!-- Reading-progress bar (scroll %), filled in by the reader script. -->
   <div class="reader-progress" aria-hidden="true"><span data-progress-bar></span></div>
 
-  <article class="essay" data-essay>
+  <article
+    class="essay"
+    data-essay
+    style={`--print-origin: ${JSON.stringify(canonical.origin)}`}
+  >
     <header class="essay-head">
+      <div class="print-identity font-mono" data-print-identity>
+        {SITE_TITLE} · {AUTHOR.name} · {canonical.href}
+      </div>
       <div class="essay-meta font-mono">
         <BrewBadge brew={essay.data.brew} lang={lang} showSubtitle={true} />
         <span>{date}</span>
@@ -143,7 +154,7 @@ const updatedDate = essay.data.updatedDate
     </aside>
   </article>
 
-  <!-- Floating reader dock: focus mode + share. -->
+  <!-- Floating reader dock: focus mode, share, print. -->
   <div class="reader-dock" data-reader-dock>
     <button type="button" class="reader-dock__btn reader-dock__focus" data-focus aria-pressed="false">
       <span data-when="off">
@@ -161,6 +172,15 @@ const updatedDate = essay.data.updatedDate
     >
       <span data-share-default><Icon name="share" size={16} /></span>
       <span data-share-done hidden><Icon name="check" size={16} /></span>
+    </button>
+    <button
+      type="button"
+      class="reader-dock__btn reader-dock__icon"
+      data-print
+      aria-label={t.printEssay}
+      title={t.printEssay}
+    >
+      <Icon name="printer" size={16} />
     </button>
   </div>
 </BaseLayout>
@@ -183,6 +203,17 @@ const updatedDate = essay.data.updatedDate
 
   .essay-head {
     margin-bottom: 3rem;
+  }
+  .print-identity {
+    display: none;
+  }
+  @media print {
+    .print-identity {
+      display: block;
+      margin-bottom: 0.75rem;
+      font-size: 8pt;
+      letter-spacing: 0.05em;
+    }
   }
   .essay-meta {
     display: flex;
@@ -381,6 +412,11 @@ const updatedDate = essay.data.updatedDate
       const on = document.documentElement.toggleAttribute('data-focus');
       focusBtn.setAttribute('aria-pressed', String(on));
     });
+
+    // Print / Save as PDF — the browser's own dialog does both.
+    document
+      .querySelector<HTMLButtonElement>('[data-print]')
+      ?.addEventListener('click', () => window.print());
 
     // Share — native share sheet, falling back to clipboard.
     const shareBtn = document.querySelector<HTMLButtonElement>('[data-share]');
