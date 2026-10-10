@@ -39,7 +39,7 @@ const overflowX = (page: Page) =>
   );
 
 // The standalone page set, exercised at every breakpoint.
-const PAGES = ['/', '/about/', '/now/', '/tags/'];
+const PAGES = ['/', '/about/', '/now/', '/tags/', '/search/'];
 
 for (const width of WIDTHS) {
   for (const path of [...PAGES, '/essays/a-map-of-the-hedge/']) {

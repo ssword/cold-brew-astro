@@ -1,0 +1,131 @@
+---
+// The search surface for one language edition. The index is a static JSON file
+// built at deploy time (see src/pages/search-index/); queries are matched in
+// the browser and never leave it.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { localeHome, type EssayLanguage } from '../lib/i18n';
+import { searchIndexHref } from '../lib/search';
+import { uiStrings } from '../lib/ui-strings';
+
+interface Props {
+  lang: EssayLanguage;
+  description: string;
+}
+
+const { lang, description } = Astro.props;
+const t = uiStrings(lang);
+const tagsHref = `${localeHome(lang)}tags/`;
+---
+
+<BaseLayout lang={lang} title={t.search} description={description}>
+  <section
+    data-search
+    data-index={searchIndexHref(lang)}
+    data-lang={lang}
+    class="mx-auto max-w-2xl pb-16"
+  >
+    <h1 class="serif-display mb-8 text-3xl font-light tracking-tight text-cream">{t.search}</h1>
+
+    <form role="search" action="" method="get" data-search-form>
+      <label for="search-query" class="sr-only">{t.searchLabel}</label>
+      <input
+        id="search-query"
+        name="q"
+        type="search"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder={t.searchLabel}
+        class="w-full rounded-md border border-panel bg-panel/60 px-4 py-3 font-body text-lg text-cream placeholder:text-muted/70 focus:border-sand/40"
+      />
+    </form>
+
+    <p role="status" data-search-status class="mt-4 font-mono text-xs tracking-wide text-muted">
+      {t.searchEmpty}
+    </p>
+
+    <ul aria-label={t.searchResults} data-search-results class="mt-6 space-y-8"></ul>
+
+    <p class="mt-12 border-t border-panel/60 pt-4 font-mono text-xs text-muted">
+      <a class="text-sand transition-colors hover:text-cream" href={tagsHref}>
+        {t.browseByTag}
+      </a>
+    </p>
+  </section>
+</BaseLayout>
+
+<script>
+  import { formatEssayDate, type EssayLanguage } from '../lib/i18n';
+  import { searchDocuments, type SearchIndex } from '../lib/search';
+  import { uiStrings } from '../lib/ui-strings';
+
+  async function setupSearch() {
+    const root = document.querySelector<HTMLElement>('[data-search]');
+    if (!root) return;
+    const input = root.querySelector<HTMLInputElement>('input[type="search"]')!;
+    const form = root.querySelector<HTMLFormElement>('[data-search-form]')!;
+    const status = root.querySelector<HTMLElement>('[data-search-status]')!;
+    const list = root.querySelector<HTMLUListElement>('[data-search-results]')!;
+    const lang = root.dataset.lang as EssayLanguage;
+    const t = uiStrings(lang);
+
+    // Same-origin static file: the query itself is never sent anywhere.
+    const index: SearchIndex = await fetch(root.dataset.index!).then((res) => res.json());
+
+    function renderResults(query: string) {
+      const hits = searchDocuments(index.documents, query);
+      list.replaceChildren(
+        ...hits.map((hit) => {
+          const item = document.createElement('li');
+          item.className = 'search-result';
+
+          const meta = document.createElement('p');
+          meta.className = 'font-mono text-xs uppercase tracking-widest text-muted';
+          meta.textContent = [formatEssayDate(new Date(hit.pubDate), lang), ...hit.tags].join(' · ');
+
+          const heading = document.createElement('h2');
+          heading.className = 'serif-display mt-1 text-2xl font-light leading-snug text-cream';
+          const link = document.createElement('a');
+          link.href = hit.href;
+          link.textContent = hit.title;
+          link.className = 'transition-colors hover:text-white';
+          heading.append(link);
+
+          const excerpt = document.createElement('p');
+          excerpt.className = 'mt-1 font-body leading-relaxed text-sand/75';
+          excerpt.textContent = hit.excerpt;
+
+          item.append(meta, heading, excerpt);
+          return item;
+        }),
+      );
+
+      const trimmed = query.trim();
+      status.textContent = !trimmed
+        ? t.searchEmpty
+        : hits.length === 0
+          ? t.searchNoResults(trimmed)
+          : t.searchResultCount(hits.length);
+    }
+
+    function update() {
+      const url = new URL(window.location.href);
+      if (input.value.trim()) url.searchParams.set('q', input.value);
+      else url.searchParams.delete('q');
+      history.replaceState(history.state, '', url);
+      renderResults(input.value);
+    }
+
+    input.addEventListener('input', update);
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      update();
+    });
+
+    // A shared or reloaded `?q=` link restores its results.
+    input.value = new URLSearchParams(window.location.search).get('q') ?? '';
+    renderResults(input.value);
+  }
+
+  // `astro:page-load` fires on the initial load and after each ClientRouter navigation.
+  document.addEventListener('astro:page-load', setupSearch);
+</script>
