@@ -103,7 +103,7 @@ const en: UiStrings = {
   searchLabel: 'Search essays',
   searchResults: 'Search results',
   searchEmpty:
-    'Type a word from a title, an excerpt, or a tag. Your query stays in this browser.',
+    'Type a word or phrase from an essay: its title, excerpt, tags, or text. Your query stays in this browser.',
   searchNoResults: (query) =>
     `Nothing matches “${query}”. Try a shorter word, or browse by tag.`,
   searchResultCount: (count) =>
@@ -160,7 +160,7 @@ const zhCN: UiStrings = {
   search: '搜索',
   searchLabel: '搜索文章',
   searchResults: '搜索结果',
-  searchEmpty: '输入标题、摘要或标签中的词语。搜索只在本浏览器中进行。',
+  searchEmpty: '输入文章中的词语或短语：标题、摘要、标签或正文均可。搜索只在本浏览器中进行。',
   searchNoResults: (query) => `没有与“${query}”匹配的文章。试试更短的词，或按标签浏览。`,
   searchResultCount: (count) => `找到 ${count} 篇文章`,
   browseByTag: '按标签浏览',

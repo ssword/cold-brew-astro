@@ -21,14 +21,14 @@ test('a title query finds the essay and links to its canonical route', async ({ 
 test('an empty query explains what to do instead of listing everything', async ({ page }) => {
   await page.goto('/search/');
 
-  await expect(page.getByRole('status')).toHaveText(/title, an excerpt, or a tag/);
+  await expect(page.getByRole('status')).toHaveText(/a word or phrase from an essay/);
   await expect(results(page).getByRole('listitem')).toHaveCount(0);
 
   await search(page, 'statistics');
   await expect(results(page).getByRole('listitem')).not.toHaveCount(0);
   await search(page, '   ');
   await expect(results(page).getByRole('listitem')).toHaveCount(0);
-  await expect(page.getByRole('status')).toHaveText(/title, an excerpt, or a tag/);
+  await expect(page.getByRole('status')).toHaveText(/a word or phrase from an essay/);
 });
 
 test('a query with no match says so and points back to browsing', async ({ page }) => {
@@ -44,13 +44,15 @@ test('a tag query finds every essay carrying the tag, case-insensitively', async
   await page.goto('/search/');
   await search(page, 'STATISTICS');
 
-  // Both carry the tag and nothing else matches, so the equal scores fall back
-  // to newest first: p < 0.05 (2026-04-08) before the CLT (2026-02-26).
+  // Both tag carriers have equal scores, so they fall back to newest first:
+  // p < 0.05 (2026-04-08) before the CLT (2026-02-26). An essay that only
+  // mentions the word in its body ranks after them.
   await expect(results(page).getByRole('link')).toHaveText([
     'Why I stopped trusting p < 0.05',
     'The central limit theorem still surprises me',
+    'Overparameterized and fine',
   ]);
-  await expect(page.getByRole('status')).toHaveText('2 essays found');
+  await expect(page.getByRole('status')).toHaveText('3 essays found');
 });
 
 test('an excerpt-only phrase finds its essay', async ({ page }) => {
@@ -85,9 +87,8 @@ test('drafts are absent from the index and from results', async ({ page, request
   expect(titles).not.toContain('初见微光');
 
   await page.goto('/search/');
-  await search(page, 'unfinished');
-  await expect(page.getByRole('status')).toHaveText(/Nothing matches/);
-  await search(page, 'notes');
+  // Words from the draft's excerpt.
+  await search(page, 'fragment kept');
   await expect(page.getByRole('status')).toHaveText(/Nothing matches/);
 });
 
@@ -130,10 +131,10 @@ test('searching sends no request carrying the query', async ({ page }) => {
   page.on('request', (req) => requests.push(req.url()));
   await page.goto('/search/');
 
-  await search(page, 'gradient descent');
+  await search(page, 'humility');
   await expect(results(page).getByRole('listitem')).toHaveCount(1);
 
-  expect(requests.filter((url) => /gradient/.test(url))).toEqual([]);
+  expect(requests.filter((url) => /humility/.test(url))).toEqual([]);
   expect(requests.every((url) => new URL(url).origin === new URL(page.url()).origin)).toBe(true);
 });
 
@@ -147,4 +148,46 @@ test('the masthead offers search quietly beside the other sections', async ({ pa
   // Reached via a ClientRouter navigation, the search still initialises.
   await search(page, 'humility');
   await expect(results(page).getByRole('link')).toHaveText(['Gradient descent is a kind of humility']);
+});
+
+test('a phrase found only in an essay body finds that essay', async ({ page }) => {
+  await page.goto('/search/');
+  // In the body of "First light", not its title, excerpt, or tags.
+  await search(page, 'the slope is real');
+
+  // Other essays hold all four words somewhere; the exact phrase ranks first.
+  const first = results(page).getByRole('link').first();
+  await expect(first).toHaveText('First light');
+  await expect(first).toHaveAttribute('href', '/essays/first-light/');
+});
+
+test('an exact phrase outranks newer essays that only scatter its words', async ({ page }) => {
+  await page.goto('/search/');
+  // The CLT essay (2026-02-26) holds the phrase; newer essays hold all three words apart.
+  await search(page, 'precise about this');
+
+  const links = results(page).getByRole('link');
+  await expect(links.first()).toHaveText('The central limit theorem still surprises me');
+});
+
+test('math is indexed as it reads, not as its TeX source', async ({ page }) => {
+  await page.goto('/search/');
+  // Several bodies use \frac in display math; the visible formula carries no backslash.
+  await search(page, '\\frac');
+  await expect(page.getByRole('status')).toHaveText(/Nothing matches/);
+
+  // The rendered σ in the CLT essay's formulas is searchable.
+  await search(page, 'σ');
+  await expect(results(page).getByRole('link')).toContainText([
+    'The central limit theorem still surprises me',
+  ]);
+});
+
+test('a phrase found only in a draft body stays hidden', async ({ page }) => {
+  await page.goto('/search/');
+  // Only in the draft's body.
+  await search(page, 'finish it later');
+
+  await expect(page.getByRole('status')).toHaveText(/Nothing matches/);
+  await expect(results(page).getByRole('listitem')).toHaveCount(0);
 });

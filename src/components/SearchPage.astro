@@ -68,6 +68,10 @@ const tagsHref = `${localeHome(lang)}tags/`;
     const lang = root.dataset.lang as EssayLanguage;
     const t = uiStrings(lang);
 
+    // A shared or reloaded `?q=` link restores its query. Restored before the
+    // index loads so anything typed while it loads is kept, not overwritten.
+    input.value = new URLSearchParams(window.location.search).get('q') ?? '';
+
     // Same-origin static file: the query itself is never sent anywhere.
     const index: SearchIndex = await fetch(root.dataset.index!).then((res) => res.json());
 
@@ -121,9 +125,9 @@ const tagsHref = `${localeHome(lang)}tags/`;
       update();
     });
 
-    // A shared or reloaded `?q=` link restores its results.
-    input.value = new URLSearchParams(window.location.search).get('q') ?? '';
-    renderResults(input.value);
+    // Show results for whatever the box holds now: the restored query, or
+    // text typed before the index arrived.
+    update();
   }
 
   // `astro:page-load` fires on the initial load and after each ClientRouter navigation.
