@@ -138,6 +138,28 @@ const kindLabels = t.sourceKinds;
     line-height: 1.55;
     color: var(--color-muted);
   }
+  @media print {
+    /* Short enough to keep whole; a shelf longer than a page still splits. */
+    .technical-sources,
+    .technical-sources li {
+      break-inside: avoid;
+    }
+    .technical-sources :global(svg) {
+      display: none;
+    }
+    /* The printed URL (appended after the link) runs on beneath the title
+       instead of becoming a stray grid cell. */
+    .technical-sources a {
+      display: block;
+    }
+    .technical-sources a > * {
+      margin-right: 0.5rem;
+    }
+    .technical-sources__citation,
+    .technical-sources li > p {
+      padding-left: 0;
+    }
+  }
   @media (max-width: 520px) {
     .technical-sources a {
       grid-template-columns: 1fr auto;

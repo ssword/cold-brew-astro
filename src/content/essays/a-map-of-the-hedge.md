@@ -22,7 +22,7 @@ sources:
     note: Official PyTorch documentation for the operation in the example.
 ---
 
-In an earlier piece I left a claim steeping: that the uncertainty a model
+In [an earlier piece](/essays/the-long-steep/) I left a claim steeping: that the uncertainty a model
 reports about its own answer is not noise to be calibrated away but a signal
 about the shape of what it was trained on. I want to come back and make one
 small part of it precise, because a claim you can measure is a claim you can
@@ -31,7 +31,7 @@ be wrong about.
 Start with the thing the model actually produces. At each step it emits a
 probability distribution over the next token, and the quantity that summarizes
 how spread out that distribution is — how much the model is hedging — is its
-entropy[^entropy]. For a distribution $p$ over $n$ choices it is
+[entropy](https://doi.org/10.1002/j.1538-7305.1948.tb01338.x)[^entropy]. For a distribution $p$ over $n$ choices it is
 
 $$
 H(p) = -\sum_{i} p_i \log p_i
