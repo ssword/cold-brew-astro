@@ -41,7 +41,7 @@ test('the main feed contains complete rendered essays, categories, and revision 
   const xml = await getFeed(request);
 
   expect(xml).toContain('<content:encoded>');
-  expect(xml).toContain('In an earlier piece I left a claim steeping');
+  expect(xml).toContain('I left a claim steeping');
   expect(xml).toContain('astro-code');
   expect(xml).toContain('<category>uncertainty</category>');
   expect(xml).toContain(

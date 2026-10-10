@@ -1,3 +1,5 @@
+import { localeSearch } from './lib/i18n';
+
 export const SITE_TITLE = 'Kaffeeklatsch';
 export const SITE_TAGLINE = 'coffee & conversations · let it steep';
 export const SITE_DESCRIPTION =
@@ -26,5 +28,5 @@ export const NAV = [
   { label: 'Essays', href: '/' },
   { label: 'About', href: '/about/' },
   { label: 'Now', href: '/now/' },
-  { label: 'Search', href: '/search/' },
+  { label: 'Search', href: localeSearch('en') },
 ] as const;

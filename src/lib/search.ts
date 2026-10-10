@@ -1,6 +1,6 @@
 import {
+  essaysInLanguage,
   LANGUAGE_INFO,
-  languageOf,
   localizedEssayHref,
   type EssayLanguage,
 } from './i18n';
@@ -39,12 +39,10 @@ interface SearchableEssay {
 }
 
 /**
- * Language editions with a search surface. Each gets its own index file so a
- * page loads only its edition's data.
+ * Where the built index for a language edition is served. Every edition gets
+ * its own file, named by its route segment, so a page loads only its
+ * edition's data.
  */
-export const SEARCH_LANGUAGES: readonly EssayLanguage[] = ['en', 'zh-CN'];
-
-/** Where the built index for a language edition is served. */
 export function searchIndexHref(language: EssayLanguage): string {
   return `/search-index/${LANGUAGE_INFO[language].route}.json`;
 }
@@ -60,16 +58,14 @@ export function buildSearchIndex(
 ): SearchIndex {
   return {
     lang: language,
-    documents: essays
-      .filter((essay) => languageOf(essay.data) === language)
-      .map((essay) => ({
-        href: localizedEssayHref(essay),
-        title: essay.data.title,
-        excerpt: essay.data.excerpt,
-        tags: [...essay.data.tags],
-        pubDate: essay.data.pubDate.toISOString().slice(0, 10),
-        text: htmlToSearchText(renderedHtmlOf(essay)),
-      })),
+    documents: essaysInLanguage(essays, language).map((essay) => ({
+      href: localizedEssayHref(essay),
+      title: essay.data.title,
+      excerpt: essay.data.excerpt,
+      tags: [...essay.data.tags],
+      pubDate: essay.data.pubDate.toISOString().slice(0, 10),
+      text: htmlToSearchText(renderedHtmlOf(essay)),
+    })),
   };
 }
 
@@ -124,20 +120,31 @@ export function normalizeForSearch(text: string): string {
 
 // Each field's weight when a query term appears in it. Title beats tags beats
 // excerpt beats body text; a term counts once per field.
-const FIELD_WEIGHTS = { title: 4, tags: 3, excerpt: 2, text: 1 } as const;
+const FIELD_WEIGHTS = [
+  { weight: 4, values: (document: SearchDocument) => [document.title] },
+  { weight: 3, values: (document: SearchDocument) => document.tags },
+  { weight: 2, values: (document: SearchDocument) => [document.excerpt] },
+  { weight: 1, values: (document: SearchDocument) => [document.text] },
+] as const;
 
-function termScore(document: SearchDocument, term: string): number {
-  let score = 0;
-  if (normalizeForSearch(document.title).includes(term)) score += FIELD_WEIGHTS.title;
-  if (document.tags.some((tag) => normalizeForSearch(tag).includes(term)))
-    score += FIELD_WEIGHTS.tags;
-  if (normalizeForSearch(document.excerpt).includes(term)) score += FIELD_WEIGHTS.excerpt;
-  if (normalizeForSearch(document.text).includes(term)) score += FIELD_WEIGHTS.text;
-  return score;
+interface NormalizedField {
+  weight: number;
+  values: string[];
 }
 
-function fieldsOf(document: SearchDocument): string[] {
-  return [document.title, ...document.tags, document.excerpt, document.text];
+function normalizedFieldsOf(document: SearchDocument): NormalizedField[] {
+  return FIELD_WEIGHTS.map(({ weight, values }) => ({
+    weight,
+    values: values(document).map(normalizeForSearch),
+  }));
+}
+
+function contains(field: NormalizedField, term: string): boolean {
+  return field.values.some((value) => value.includes(term));
+}
+
+function termScore(fields: readonly NormalizedField[], term: string): number {
+  return fields.reduce((score, field) => score + (contains(field, term) ? field.weight : 0), 0);
 }
 
 /**
@@ -158,11 +165,12 @@ export function searchDocuments(
 
   return documents
     .map((document) => {
-      const scores = terms.map((term) => termScore(document, term));
+      const fields = normalizedFieldsOf(document);
+      const scores = terms.map((term) => termScore(fields, term));
       return {
         document,
         matched: scores.every((score) => score > 0),
-        phrase: fieldsOf(document).some((field) => normalizeForSearch(field).includes(phrase)),
+        phrase: fields.some((field) => contains(field, phrase)),
         score: scores.reduce((sum, score) => sum + score, 0),
       };
     })

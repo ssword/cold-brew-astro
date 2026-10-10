@@ -1,13 +1,13 @@
 import type { APIContext } from 'astro';
 import { getCollection } from 'astro:content';
 import { publicEssays } from '../../lib/essays';
-import { LANGUAGE_INFO, languageFromRoute } from '../../lib/i18n';
-import { buildSearchIndex, SEARCH_LANGUAGES } from '../../lib/search';
+import { ESSAY_LANGUAGES, LANGUAGE_INFO, languageFromRoute } from '../../lib/i18n';
+import { buildSearchIndex } from '../../lib/search';
 
 // One static index per searchable edition, built from the public selection:
 // drafts are never indexed, in any environment.
 export function getStaticPaths() {
-  return SEARCH_LANGUAGES.map((language) => ({
+  return ESSAY_LANGUAGES.map((language) => ({
     params: { lang: LANGUAGE_INFO[language].route },
   }));
 }
