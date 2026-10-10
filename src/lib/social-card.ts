@@ -1,6 +1,7 @@
 import { SITE_TITLE } from '../consts';
 import {
   essaySlug,
+  formatEssayDate,
   LANGUAGE_INFO,
   languageOf,
   type EssayLanguage,
@@ -70,10 +71,7 @@ export function renderSocialCardSvg(data: SocialCardData): string {
   const titleSize = lines.length > 2 ? 64 : chinese ? 74 : 78;
   const titleStart = lines.length > 2 ? 238 : 265;
   const lineHeight = Math.round(titleSize * 1.08);
-  const date = new Intl.DateTimeFormat(
-    LANGUAGE_INFO[data.language].dateLocale,
-    { year: 'numeric', month: 'long', day: 'numeric' },
-  ).format(data.pubDate);
+  const date = formatEssayDate(data.pubDate, data.language);
   const tags = data.tags.slice(0, 3).join('  ·  ');
 
   return `<?xml version="1.0" encoding="UTF-8"?>

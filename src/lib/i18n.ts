@@ -51,6 +51,8 @@ export function localeFeed(language: EssayLanguage): string {
     : `/${LANGUAGE_INFO[language].route}/rss.xml`;
 }
 
+// Frontmatter dates are calendar days parsed as UTC midnight, so they are
+// formatted in UTC; the build machine's local zone would shift them a day.
 export function formatEssayDate(
   date: Date,
   language: EssayLanguage,
@@ -59,6 +61,7 @@ export function formatEssayDate(
     year: 'numeric',
     month: 'long',
     day: 'numeric',
+    timeZone: 'UTC',
   }).format(date);
 }
 
