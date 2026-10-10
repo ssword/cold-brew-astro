@@ -27,6 +27,6 @@ enough to justify it.
 
 ## Maintenance note
 
-The test suite passes, but the development server currently detects the Vite 8
-copy brought by Vitest alongside Astro's Vite 7 copy. Align those dependencies
-before a larger dependency-upgrade cycle.
+Vitest would otherwise install its own Vite 8 alongside Astro 6's Vite 7. The
+`overrides.vite` entry in `package.json` keeps a single Vite 7 copy; drop it
+when upgrading to an Astro major that ships Vite 8.
