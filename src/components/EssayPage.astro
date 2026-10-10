@@ -143,7 +143,7 @@ const updatedDate = essay.data.updatedDate
     </aside>
   </article>
 
-  <!-- Floating reader dock: focus mode + share. -->
+  <!-- Floating reader dock: focus mode, share, print. -->
   <div class="reader-dock" data-reader-dock>
     <button type="button" class="reader-dock__btn reader-dock__focus" data-focus aria-pressed="false">
       <span data-when="off">
@@ -161,6 +161,15 @@ const updatedDate = essay.data.updatedDate
     >
       <span data-share-default><Icon name="share" size={16} /></span>
       <span data-share-done hidden><Icon name="check" size={16} /></span>
+    </button>
+    <button
+      type="button"
+      class="reader-dock__btn reader-dock__icon"
+      data-print
+      aria-label={t.printEssay}
+      title={t.printEssay}
+    >
+      <Icon name="printer" size={16} />
     </button>
   </div>
 </BaseLayout>
@@ -381,6 +390,11 @@ const updatedDate = essay.data.updatedDate
       const on = document.documentElement.toggleAttribute('data-focus');
       focusBtn.setAttribute('aria-pressed', String(on));
     });
+
+    // Print / Save as PDF — the browser's own dialog does both.
+    document
+      .querySelector<HTMLButtonElement>('[data-print]')
+      ?.addEventListener('click', () => window.print());
 
     // Share — native share sheet, falling back to clipboard.
     const shareBtn = document.querySelector<HTMLButtonElement>('[data-share]');

@@ -23,6 +23,7 @@ export interface UiStrings {
   focus: string;
   exitFocus: string;
   shareEssay: string;
+  printEssay: string;
 
   revisionNotes: string;
 
@@ -62,6 +63,7 @@ const en: UiStrings = {
   focus: 'Focus',
   exitFocus: 'Exit focus',
   shareEssay: 'Share this essay',
+  printEssay: 'Print or save as PDF',
 
   revisionNotes: 'Revision notes',
 
@@ -108,6 +110,7 @@ const zhCN: UiStrings = {
   focus: '专注',
   exitFocus: '退出专注',
   shareEssay: '分享这篇文章',
+  printEssay: '打印或存为 PDF',
 
   revisionNotes: '修订记录',
 
