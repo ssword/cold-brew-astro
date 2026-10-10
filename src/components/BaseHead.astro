@@ -7,6 +7,7 @@ import {
   type EssayLanguage,
   type LanguageAlternate,
 } from '../lib/i18n';
+import { canonicalUrl } from '../lib/canonical';
 
 interface ArticleMetadata {
   publishedTime: Date;
@@ -40,7 +41,7 @@ const {
 } = Astro.props;
 
 const pageTitle = title ? `${title} — ${SITE_TITLE}` : SITE_TITLE;
-const canonical = new URL(Astro.url.pathname, Astro.site);
+const canonical = canonicalUrl(Astro);
 const imageUrl = new URL(image, Astro.site);
 const rssUrl = new URL(localeFeed(lang), Astro.site);
 const currentLocale = LANGUAGE_INFO[languageOf({ lang })].openGraphLocale;

@@ -17,6 +17,7 @@ import {
   languageOf,
   localizedTagHref,
 } from '../lib/i18n';
+import { canonicalUrl } from '../lib/canonical';
 import { uiStrings } from '../lib/ui-strings';
 import StatusTag from './StatusTag.astro';
 import BrewBadge from './BrewBadge.astro';
@@ -44,7 +45,7 @@ const translations = languageAlternates(essay, published);
 const date = formatEssayDate(essay.data.pubDate, lang);
 // Printed copies lose the masthead, so they carry the site, author, and
 // canonical address in a print-only line instead.
-const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.href;
+const canonical = canonicalUrl(Astro);
 const updatedDate = essay.data.updatedDate
   ? formatEssayDate(essay.data.updatedDate, lang)
   : undefined;
@@ -69,7 +70,7 @@ const updatedDate = essay.data.updatedDate
   <article class="essay" data-essay>
     <header class="essay-head">
       <div class="print-identity font-mono" data-print-identity>
-        {SITE_TITLE} · {AUTHOR.name} · {canonicalUrl}
+        {SITE_TITLE} · {AUTHOR.name} · {canonical.href}
       </div>
       <div class="essay-meta font-mono">
         <BrewBadge brew={essay.data.brew} lang={lang} showSubtitle={true} />
