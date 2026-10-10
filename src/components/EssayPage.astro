@@ -68,9 +68,9 @@ const updatedDate = essay.data.updatedDate
 
   <article class="essay" data-essay>
     <header class="essay-head">
-      <p class="print-identity font-mono" data-print-identity>
+      <div class="print-identity font-mono" data-print-identity>
         {SITE_TITLE} · {AUTHOR.name} · {canonicalUrl}
-      </p>
+      </div>
       <div class="essay-meta font-mono">
         <BrewBadge brew={essay.data.brew} lang={lang} showSubtitle={true} />
         <span>{date}</span>
