@@ -27,6 +27,12 @@ enough to justify it.
 
 ## Maintenance note
 
-Vitest would otherwise install its own Vite 8 alongside Astro 6's Vite 7. The
-`overrides.vite` entry in `package.json` keeps a single Vite 7 copy; drop it
-when upgrading to an Astro major that ships Vite 8.
+Astro 6 requires Vite 7, and Vitest accepts Vite 6, 7, or 8. Left alone, npm
+gives Vitest its own Vite 8, and `astro dev` warns about the second copy. A
+direct `vite` devDependency (`^7.3.2`, Astro's own range) makes the project's
+Vite 7 the single hoisted copy that both Astro and Vitest resolve. It is a
+declared dependency, not an `overrides` entry, so npm still checks it against
+each package's Vite peer range and will report a conflict instead of forcing
+Vite 7 onto a package that can no longer use it. Raise the range together with
+Astro when moving to an Astro major that ships Vite 8, and confirm with
+`npm ls vite` (one version) and a clean `astro dev` start.
