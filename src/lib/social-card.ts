@@ -1,5 +1,7 @@
+import { SITE_TITLE } from '../consts';
 import {
   essaySlug,
+  formatEssayDate,
   LANGUAGE_INFO,
   languageOf,
   type EssayLanguage,
@@ -69,10 +71,7 @@ export function renderSocialCardSvg(data: SocialCardData): string {
   const titleSize = lines.length > 2 ? 64 : chinese ? 74 : 78;
   const titleStart = lines.length > 2 ? 238 : 265;
   const lineHeight = Math.round(titleSize * 1.08);
-  const date = new Intl.DateTimeFormat(
-    LANGUAGE_INFO[data.language].dateLocale,
-    { year: 'numeric', month: 'long', day: 'numeric' },
-  ).format(data.pubDate);
+  const date = formatEssayDate(data.pubDate, data.language);
   const tags = data.tags.slice(0, 3).join('  ·  ');
 
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -96,7 +95,7 @@ export function renderSocialCardSvg(data: SocialCardData): string {
   <g transform="translate(86 66)">
     <path d="M15 5C5 12 2 28 10 40c8 12 24 15 34 8 10-7 13-23 5-35C41 1 25-2 15 5Z" fill="none" stroke="#d4bda6" stroke-width="2"/>
     <path d="M42 5C32 15 24 27 12 43" fill="none" stroke="#d4bda6" stroke-width="2" stroke-linecap="round"/>
-    <text x="66" y="38" fill="#eed9c4" font-family="Fraunces Variable, Georgia, serif" font-size="38" font-weight="300">cold brew</text>
+    <text x="66" y="38" fill="#eed9c4" font-family="Fraunces Variable, Georgia, serif" font-size="38" font-weight="300">${escapeXml(SITE_TITLE)}</text>
   </g>
   <text x="88" y="164" fill="#9e8774" font-family="JetBrains Mono Variable, monospace" font-size="18" letter-spacing="4">${chinese ? '让它慢慢浸泡' : 'LET IT STEEP'}</text>
   <rect x="88" y="194" width="450" height="2" fill="url(#rule)"/>

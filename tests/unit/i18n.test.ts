@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import {
   essaySlug,
+  formatEssayDate,
   essaysInLanguage,
   languageAlternates,
   localizedEssayHref,
@@ -56,3 +57,20 @@ describe('language selection', () => {
   });
 });
 
+
+describe('essay dates', () => {
+  const originalTz = process.env.TZ;
+  afterEach(() => {
+    process.env.TZ = originalTz;
+  });
+
+  it('formats a frontmatter day as that day, whatever the build machine zone', () => {
+    // Frontmatter `pubDate: 2026-05-20` parses to UTC midnight.
+    const pubDate = new Date('2026-05-20');
+    for (const zone of ['America/Chicago', 'Asia/Shanghai', 'UTC']) {
+      process.env.TZ = zone;
+      expect(formatEssayDate(pubDate, 'en')).toBe('May 20, 2026');
+      expect(formatEssayDate(pubDate, 'zh-CN')).toBe('2026年5月20日');
+    }
+  });
+});
