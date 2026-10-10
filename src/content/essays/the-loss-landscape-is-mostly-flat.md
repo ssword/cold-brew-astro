@@ -3,6 +3,7 @@ title: The loss landscape is mostly flat
 excerpt: What high-dimensional minima actually look like, and why that turns out to be a kind of mercy.
 pubDate: 2026-06-10
 status: brewed
+brew: cappuccino
 tags:
   - optimization
   - deep learning

@@ -1,11 +1,12 @@
 ---
-import type { Lifecycle } from '../lib/essays';
+import type { Lifecycle, BrewType } from '../lib/essays';
 import {
   formatEssayDate,
   languageOf,
   type EssayLanguage,
 } from '../lib/i18n';
 import StatusTag from './StatusTag.astro';
+import BrewBadge from './BrewBadge.astro';
 
 interface Props {
   essay: {
@@ -13,6 +14,7 @@ interface Props {
       title: string;
       excerpt: string;
       status: Lifecycle;
+      brew?: BrewType;
       pubDate: Date;
       lang?: EssayLanguage;
     };
@@ -31,13 +33,14 @@ const Tag = featured ? 'article' : 'li';
 const titleSize = featured ? 'text-3xl sm:text-4xl' : 'text-2xl sm:text-3xl';
 ---
 
-<Tag class="essay-card group relative" data-featured={featured ? '' : undefined}>
+<Tag class="essay-card group relative" data-featured={featured ? '' : undefined} data-brew={essay.data.brew ?? 'cold-brew'}>
   <span
     class="absolute -left-4 top-7 hidden h-1.5 w-1.5 -translate-x-1 rounded-full bg-sand opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 sm:block"
     aria-hidden="true"
   ></span>
 
   <div class="flex flex-wrap items-center gap-2 font-mono text-xs uppercase tracking-widest text-muted">
+    <BrewBadge brew={essay.data.brew} lang={lang} />
     <span>{date}</span>
     <span class="text-muted/40">•</span>
     <span>{lang === 'zh-CN' ? `约 ${minutesRead} 分钟` : `${minutesRead} min read`}</span>

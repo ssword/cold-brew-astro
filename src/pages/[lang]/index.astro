@@ -5,6 +5,7 @@ import { publishedEssays, toDisplayEssays } from '../../lib/essays';
 import { essaysInLanguage } from '../../lib/i18n';
 import EssayCard from '../../components/EssayCard.astro';
 import AmbientCafe from '../../components/AmbientCafe.astro';
+import TastingMenu from '../../components/TastingMenu.astro';
 
 export function getStaticPaths() {
   return [{ params: { lang: 'zh' } }];
@@ -34,6 +35,8 @@ const [featured, ...rest] = await toDisplayEssays(published, render);
         让它慢慢浸泡
       </p>
     </section>
+
+    <TastingMenu lang="zh-CN" />
 
     <div class="space-y-12 sm:space-y-14">
       {featured && (

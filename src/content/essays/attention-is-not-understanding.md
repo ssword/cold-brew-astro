@@ -3,6 +3,7 @@ title: Attention is not understanding
 excerpt: A weighted average is a powerful thing, but it is not the same as knowing what matters.
 pubDate: 2026-05-05
 status: brewed
+brew: espresso
 tags:
   - attention
   - language models

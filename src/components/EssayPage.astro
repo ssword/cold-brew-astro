@@ -18,6 +18,7 @@ import {
   localizedTagHref,
 } from '../lib/i18n';
 import StatusTag from './StatusTag.astro';
+import BrewBadge from './BrewBadge.astro';
 import Icon from './Icon.astro';
 import RevisionLedger from './RevisionLedger.astro';
 import EssayTrail from './EssayTrail.astro';
@@ -64,6 +65,7 @@ const updatedDate = essay.data.updatedDate
   <article class="essay" data-essay>
     <header class="essay-head">
       <div class="essay-meta font-mono">
+        <BrewBadge brew={essay.data.brew} lang={lang} showSubtitle={true} />
         <span>{date}</span>
         <span class="dot">•</span>
         <span>{chinese ? `约 ${minutesRead} 分钟` : `${minutesRead} min read`}</span>
