@@ -98,6 +98,34 @@ test.describe('print media', () => {
     });
   }
 
+  test('printed essay keeps equations, footnotes, and code indentation', async ({ page }) => {
+    await page.goto(ESSAY);
+    const article = page.locator('article.essay');
+    await expect(article.locator('.katex-display').first()).toBeVisible();
+    await expect(article.locator('.katex').first()).toBeVisible();
+    await expect(article.locator('sup a[data-footnote-ref]').first()).toBeVisible();
+    const notes = article.locator('section[data-footnotes]');
+    await expect(notes).toBeVisible();
+    await expect(notes).toContainText('natural logarithm');
+
+    const pre = article.locator('pre').first();
+    const { whiteSpace, text } = await pre.evaluate((el) => ({
+      whiteSpace: getComputedStyle(el).whiteSpace,
+      text: el.textContent ?? '',
+    }));
+    expect(whiteSpace).toMatch(/^pre/);
+    expect(text).toMatch(/\n {4}\S/);
+  });
+
+  test('printing a Chinese essay drops the chrome and keeps the prose', async ({ page }) => {
+    await page.goto(ZH_ESSAY);
+    for (const selector of ['body > header', 'body > footer', '[data-reader-dock]', '.essay-reply']) {
+      await expect(page.locator(selector).first()).toBeHidden();
+    }
+    await expect(page.locator('article.essay h1')).toHaveText('初见微光');
+    await expect(page.locator('article.essay p', { hasText: '耐心是唯一的原料' })).toBeVisible();
+  });
+
   test('printed essay keeps its publication and revision dates', async ({ page }) => {
     await page.goto('/essays/the-long-steep/');
     const meta = page.locator('.essay-meta');
