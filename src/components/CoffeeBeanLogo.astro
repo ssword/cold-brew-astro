@@ -1,8 +1,9 @@
 ---
 /**
- * Animated coffee-bean logo, ported from the design's CoffeeBeanLogo.tsx.
- * framer-motion is replaced with CSS: a gentle bean sway and a hanging-drip
- * bob, both paused under prefers-reduced-motion. Decorative only.
+ * Decoupled Coffee Bean & Brewed Drop Logo.
+ * - Bean is placed at the optimal golden angle (~32deg) with authentic Arabica lobes and S-fissure.
+ * - Brewed droplet is physically separated by a clear air gap (~18px).
+ * - Droplet movement follows independent vertical gravity physics and does NOT rotate with the bean.
  */
 interface Props {
   size?: number;
@@ -24,56 +25,114 @@ const uid = Math.random().toString(36).slice(2, 8);
     xmlns="http://www.w3.org/2000/svg"
   >
     <defs>
-      <radialGradient id={`glow-${uid}`} cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#eed9c4" stop-opacity="0.15"></stop>
-        <stop offset="100%" stop-color="#1b1311" stop-opacity="0"></stop>
+      <!-- Warm ambient backlight behind bean -->
+      <radialGradient id={`glow-${uid}`} cx="50%" cy="38%" r="48%">
+        <stop offset="0%" stop-color="#d9914a" stop-opacity="0.18"></stop>
+        <stop offset="70%" stop-color="#1b1311" stop-opacity="0.05"></stop>
+        <stop offset="100%" stop-color="#0f0a09" stop-opacity="0"></stop>
       </radialGradient>
-      <linearGradient id={`bean-${uid}`} x1="10" y1="10" x2="90" y2="100" gradientUnits="userSpaceOnUse">
+
+      <!-- Roast bean gradient: golden cream to deep roasted amber -->
+      <linearGradient id={`bean-${uid}`} x1="-20" y1="-28" x2="24" y2="28" gradientUnits="userSpaceOnUse">
         <stop offset="0%" stop-color="#eed9c4"></stop>
-        <stop offset="60%" stop-color="#d4bda6"></stop>
-        <stop offset="100%" stop-color="#9e8774"></stop>
+        <stop offset="38%" stop-color="#d4bda6"></stop>
+        <stop offset="75%" stop-color="#8c5835"></stop>
+        <stop offset="100%" stop-color="#4a2e1b"></stop>
       </linearGradient>
-      <linearGradient id={`drip-${uid}`} x1="50" y1="95" x2="50" y2="125" gradientUnits="userSpaceOnUse">
+
+      <!-- Brewed drop liquid gradient: warm amber-copper -->
+      <linearGradient id={`drip-${uid}`} x1="50" y1="80" x2="50" y2="108" gradientUnits="userSpaceOnUse">
         <stop offset="0%" stop-color="#eed9c4"></stop>
-        <stop offset="100%" stop-color="#d4bda6" stop-opacity="0.8"></stop>
+        <stop offset="32%" stop-color="#d9914a"></stop>
+        <stop offset="100%" stop-color="#6e3713"></stop>
       </linearGradient>
     </defs>
 
-    <rect x="0" y="0" width="100" height="100" fill={`url(#glow-${uid})`} rx="50"></rect>
+    <!-- Ambient backlight -->
+    <circle cx="50" cy="45" r="44" fill={`url(#glow-${uid})`}></circle>
 
-    <!-- Bean body (gentle sway) -->
-    <path
-      class="cb-bean"
-      d="M 50,5 C 18,5 10,25 10,50 C 10,75 22,95 50,95 C 78,95 90,75 90,50 C 90,25 82,5 50,5 Z"
-      fill={`url(#bean-${uid})`}
-    ></path>
+    <!-- COFFEE BEAN (Fixed golden angle: 32deg, with independent gentle sway) -->
+    <g class="cb-bean-group" transform="translate(50, 40)">
+      <g class="cb-bean">
+        <!-- Arabica bean body -->
+        <path
+          d="M 0,-30 C 17,-30 25,-15 25,0 C 25,17 16,30 0,30 C -16,30 -25,17 -25,0 C -25,-15 -17,-30 0,-30 Z"
+          fill={`url(#bean-${uid})`}
+        ></path>
 
-    <!-- Crease -->
-    <path
-      d="M 50,5 C 45,25 35,40 50,52 C 65,65 55,80 50,95"
-      stroke="#1b1311"
-      stroke-width="4.5"
-      stroke-linecap="round"
-      fill="none"
-      opacity="0.85"
-    ></path>
+        <!-- Deep central fissure shadow crevice -->
+        <path
+          d="M 0,-28 C -4,-16 -2,-6 2,0 C 6,7 4,18 0,27"
+          stroke="#23140d"
+          stroke-width="4.2"
+          stroke-linecap="round"
+          fill="none"
+          opacity="0.9"
+        ></path>
 
-    <!-- Highlight -->
-    <path
-      d="M 22,25 C 17,40 18,65 30,80"
-      stroke="#ffffff"
-      stroke-width="1.5"
-      stroke-linecap="round"
-      fill="none"
-      opacity="0.25"
-    ></path>
+        <!-- Signature inner S-crease line -->
+        <path
+          d="M 0,-27 C -3,-16 -1,-6 2,0 C 5,7 3,17 0,26"
+          stroke="#120a06"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          fill="none"
+        ></path>
 
-    <!-- Hanging drip (bob) -->
-    <path
-      class="cb-drip"
-      d="M 50,94 C 44,94 40,99 40,106 C 40,114 50,126 50,126 C 50,126 60,114 60,106 C 60,99 56,94 50,94 Z"
-      fill={`url(#drip-${uid})`}
-    ></path>
+        <!-- Left lobe specular highlight -->
+        <path
+          d="M -15,-16 C -20,-7 -19,7 -13,16"
+          stroke="#ffffff"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          fill="none"
+          opacity="0.32"
+        ></path>
+
+        <!-- Right lobe rim gloss -->
+        <path
+          d="M 14,-14 C 18,-5 17,7 12,15"
+          stroke="#eed9c4"
+          stroke-width="1.2"
+          stroke-linecap="round"
+          fill="none"
+          opacity="0.25"
+        ></path>
+      </g>
+    </g>
+
+    <!-- BREWED DROPLET (Completely decoupled from bean, vertical gravity only) -->
+    <g class="cb-drip-group">
+      <!-- Expanding gravity ripple ring -->
+      <ellipse
+        cx="50"
+        cy="118"
+        rx="12"
+        ry="3"
+        stroke="#d9914a"
+        stroke-width="1"
+        fill="none"
+        class="cb-ripple"
+      ></ellipse>
+
+      <!-- The Falling Coffee Droplet -->
+      <g class="cb-drip">
+        <path
+          d="M 50,82 C 49,84 42,93 42,100 C 42,105 45.6,108.5 50,108.5 C 54.4,108.5 58,105 58,100 C 58,93 51,84 50,82 Z"
+          fill={`url(#drip-${uid})`}
+        ></path>
+
+        <!-- Wet specular glossy gleam on drop -->
+        <path
+          d="M 45,96 C 44,100 45,104 47,106"
+          stroke="#ffffff"
+          stroke-width="1.2"
+          stroke-linecap="round"
+          fill="none"
+          opacity="0.6"
+        ></path>
+      </g>
+    </g>
   </svg>
 </span>
 
@@ -82,43 +141,84 @@ const uid = Math.random().toString(36).slice(2, 8);
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    overflow: visible;
   }
 
+  /* Bean starts at golden angle 32deg and sways gently */
   .cb-bean {
-    transform-box: fill-box;
     transform-origin: center;
-    animation: cb-sway 8s ease-in-out infinite;
+    transform: rotate(32deg);
+    transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: cb-bean-sway 7s ease-in-out infinite;
   }
 
+  /* On header hover, bean playfully rotates further, while droplet remains strictly vertical */
+  :global(.group:hover) .cb-bean {
+    transform: rotate(44deg) scale(1.08);
+  }
+
+  /* Droplet has strictly vertical gravity movement (never rotates) */
   .cb-drip {
-    transform-box: fill-box;
-    transform-origin: center top;
-    animation: cb-drip 4s ease-in-out infinite;
+    transform-origin: 50px 82px;
+    animation: cb-drip-fall 3.2s ease-in-out infinite;
+    transition: transform 0.4s ease;
   }
 
-  @keyframes cb-sway {
+  /* On hover, droplet stretches downward under gravity */
+  :global(.group:hover) .cb-drip {
+    transform: translateY(6px) scale(0.92, 1.1);
+  }
+
+  /* Delicate fluid ripple below drop */
+  .cb-ripple {
+    transform-origin: 50px 118px;
+    animation: cb-ripple-pulse 3.2s ease-in-out infinite;
+  }
+
+  @keyframes cb-bean-sway {
     0%,
     100% {
-      transform: rotate(1deg) scale(0.99);
+      transform: rotate(32deg) scale(0.99);
     }
     50% {
-      transform: rotate(-1deg) scale(1.01);
+      transform: rotate(36deg) scale(1.01);
     }
   }
 
-  @keyframes cb-drip {
+  @keyframes cb-drip-fall {
     0%,
     100% {
       transform: translateY(0) scale(1, 1);
     }
+    45% {
+      transform: translateY(5.5px) scale(0.92, 1.09);
+    }
+    70% {
+      transform: translateY(-0.8px) scale(1.04, 0.96);
+    }
+  }
+
+  @keyframes cb-ripple-pulse {
+    0%,
+    30% {
+      opacity: 0;
+      transform: scale(0.6);
+    }
     50% {
-      transform: translateY(4px) scale(1.08, 0.92);
+      opacity: 0.4;
+      transform: scale(1);
+    }
+    80%,
+    100% {
+      opacity: 0;
+      transform: scale(1.4);
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .cb-bean,
-    .cb-drip {
+    .cb-drip,
+    .cb-ripple {
       animation: none;
     }
   }

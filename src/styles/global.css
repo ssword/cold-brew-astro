@@ -14,6 +14,7 @@
   --color-text: #e8ded4;
   --color-sand: #d4bda6;
   --color-muted: #9e8774;
+  --color-copper: #d9914a;
 
   /* Font roles. Each chain keeps a CJK fallback slot before the generic family,
      so a self-hosted Chinese face can be prepended later without reworking it.
@@ -23,6 +24,8 @@
   --font-body: "Newsreader Variable", "Noto Serif SC Variable", "Noto Serif SC", "Songti SC", Georgia, "Times New Roman", serif;
   --font-ui: "Inter Variable", "Noto Sans SC Variable", "Noto Sans SC", "PingFang SC", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, monospace;
+  --font-wild: "Permanent Marker", "Rock Salt", "Caveat", cursive, sans-serif;
+  --font-casual: "Caveat", "Permanent Marker", cursive, sans-serif;
 
   /* Type scale. */
   --text-step--1: 0.875rem;

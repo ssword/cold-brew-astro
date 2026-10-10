@@ -1,5 +1,5 @@
-export const SITE_TITLE = 'cold brew';
-export const SITE_TAGLINE = 'let it steep';
+export const SITE_TITLE = 'Kaffeeklatsch';
+export const SITE_TAGLINE = 'coffee & conversations · let it steep';
 export const SITE_DESCRIPTION =
   'a home for slow, considered writing on deep learning, language models, and statistics — the kind of thinking that shouldn’t be rushed.';
 

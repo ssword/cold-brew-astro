@@ -73,7 +73,7 @@ test('a tag page exposes and advertises its dedicated RSS feed', async ({ page }
   );
   await expect(
     page.locator(
-      'head link[rel="alternate"][type="application/rss+xml"][title="language models essays — cold brew"]',
+      'head link[rel="alternate"][type="application/rss+xml"][title="language models essays — Kaffeeklatsch"]',
     ),
   ).toHaveAttribute(
     'href',

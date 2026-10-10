@@ -11,7 +11,7 @@ test('the About page uses the shared layout, voice, and reading typography', asy
   await page.goto('/about/');
 
   // shared layout: masthead home link + footer
-  await expect(page.getByRole('link', { name: 'cold brew' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Kaffeeklatsch' })).toBeVisible();
   await expect(page.locator('footer')).toBeVisible();
 
   // reads like a person: first-person copy
