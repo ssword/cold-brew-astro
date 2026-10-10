@@ -13,7 +13,13 @@ export const TWITTER_HANDLE = '@sswordme';
 
 export const SOCIAL = {
   github: 'https://github.com/ssword',
-  twitter: 'https://twitter.com/sswordme',
+  twitter: `https://twitter.com/${TWITTER_HANDLE.slice(1)}`,
+} as const;
+
+// The byline used in Article structured data.
+export const AUTHOR = {
+  name: 'ssword',
+  url: SOCIAL.github,
 } as const;
 
 export const NAV = [

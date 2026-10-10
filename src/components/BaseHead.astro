@@ -1,5 +1,5 @@
 ---
-import { SITE_TITLE, SITE_DESCRIPTION, OG_IMAGE, TWITTER_HANDLE } from '../consts';
+import { SITE_TITLE, SITE_DESCRIPTION, OG_IMAGE, TWITTER_HANDLE, AUTHOR } from '../consts';
 import {
   LANGUAGE_INFO,
   localeFeed,
@@ -72,8 +72,8 @@ const structuredData =
         url: canonical.href,
         author: {
           '@type': 'Person',
-          name: 'ssword',
-          url: 'https://github.com/ssword',
+          name: AUTHOR.name,
+          url: AUTHOR.url,
         },
         publisher: {
           '@type': 'Organization',
