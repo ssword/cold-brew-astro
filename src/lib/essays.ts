@@ -13,6 +13,16 @@ export const BREW_TYPES = [
 ] as const;
 export type BrewType = (typeof BREW_TYPES)[number];
 
+export const SOURCE_KINDS = [
+  'paper',
+  'code',
+  'notebook',
+  'dataset',
+  'documentation',
+  'article',
+] as const;
+export type SourceKind = (typeof SOURCE_KINDS)[number];
+
 export interface BrewVesselInfo {
   id: BrewType;
   name: Record<EssayLanguage, string>;

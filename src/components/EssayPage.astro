@@ -17,6 +17,7 @@ import {
   languageOf,
   localizedTagHref,
 } from '../lib/i18n';
+import { uiStrings } from '../lib/ui-strings';
 import StatusTag from './StatusTag.astro';
 import BrewBadge from './BrewBadge.astro';
 import Icon from './Icon.astro';
@@ -33,7 +34,7 @@ interface Props {
 
 const { essay } = Astro.props as Props;
 const lang = languageOf(essay.data);
-const chinese = lang === 'zh-CN';
+const t = uiStrings(lang);
 const rendered = await render(essay);
 const { Content } = rendered;
 const minutesRead = minutesReadOf(rendered);
@@ -68,12 +69,12 @@ const updatedDate = essay.data.updatedDate
         <BrewBadge brew={essay.data.brew} lang={lang} showSubtitle={true} />
         <span>{date}</span>
         <span class="dot">•</span>
-        <span>{chinese ? `约 ${minutesRead} 分钟` : `${minutesRead} min read`}</span>
+        <span>{t.minutesRead(minutesRead)}</span>
         {updatedDate && (
           <>
             <span class="dot">•</span>
             <span data-last-revised>
-              {chinese ? `修订于 ${updatedDate}` : `Revised ${updatedDate}`}
+              {t.revisedOn(updatedDate)}
             </span>
           </>
         )}
@@ -83,10 +84,10 @@ const updatedDate = essay.data.updatedDate
       {translations.length > 0 && (
         <nav
           class="essay-languages font-mono"
-          aria-label={chinese ? '其他语言版本' : 'Other language editions'}
+          aria-label={t.otherEditions}
           data-language-switcher
         >
-          <span>{chinese ? '阅读语言' : 'Read in'}</span>
+          <span>{t.readIn}</span>
           {translations.map((translation) => (
             <a
               href={translation.href}
@@ -125,7 +126,7 @@ const updatedDate = essay.data.updatedDate
         <Icon name="coffee" size={24} class="text-sand" />
         <div>
           <h2 class="pairing__title serif-display">
-            {chinese ? '建议搭配的咖啡' : 'Suggested brewing pairing'}
+            {t.pairingTitle}
           </h2>
           <p>{essay.data.brewingNotes}</p>
         </div>
@@ -135,9 +136,9 @@ const updatedDate = essay.data.updatedDate
     <EssayTrail trail={trail} lang={lang} />
 
     <aside class="essay-reply font-ui" data-essay-extra>
-      {chinese ? '发现错误，或有不同意见？' : 'Found a mistake, or want to push back?'}{' '}
+      {t.replyPrompt}{' '}
       <a href={`mailto:${REPLY_EMAIL}`}>
-        {chinese ? '欢迎邮件回复。' : 'Reply by email.'}
+        {t.replyLink}
       </a>
     </aside>
   </article>
@@ -146,17 +147,17 @@ const updatedDate = essay.data.updatedDate
   <div class="reader-dock" data-reader-dock>
     <button type="button" class="reader-dock__btn reader-dock__focus" data-focus aria-pressed="false">
       <span data-when="off">
-        <Icon name="eye" size={14} /> {chinese ? '专注' : 'Focus'}
+        <Icon name="eye" size={14} /> {t.focus}
       </span>
       <span data-when="on">
-        <Icon name="eye-off" size={14} /> {chinese ? '退出专注' : 'Exit focus'}
+        <Icon name="eye-off" size={14} /> {t.exitFocus}
       </span>
     </button>
     <button
       type="button"
       class="reader-dock__btn reader-dock__icon"
       data-share
-      aria-label={chinese ? '分享这篇文章' : 'Share this essay'}
+      aria-label={t.shareEssay}
     >
       <span data-share-default><Icon name="share" size={16} /></span>
       <span data-share-done hidden><Icon name="check" size={16} /></span>

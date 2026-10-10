@@ -3,6 +3,7 @@ import { Picture } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import { BREW_VESSELS, type BrewType } from '../lib/essays';
 import type { EssayLanguage } from '../lib/i18n';
+import { uiStrings } from '../lib/ui-strings';
 import coldBrewImage from '../assets/vessels/cold-brew.jpg';
 import espressoImage from '../assets/vessels/espresso.jpg';
 import cappuccinoImage from '../assets/vessels/cappuccino.jpg';
@@ -13,7 +14,7 @@ interface Props {
 }
 
 const { lang = 'en' } = Astro.props;
-const chinese = lang === 'zh-CN';
+const t = uiStrings(lang);
 
 const vessels = Object.values(BREW_VESSELS);
 
@@ -27,17 +28,17 @@ const VESSEL_IMAGES: Record<BrewType, ImageMetadata> = {
 };
 ---
 
-<section class="tasting-menu mb-12 sm:mb-16" aria-label={chinese ? '风味菜单' : 'Tasting menu'}>
+<section class="tasting-menu mb-12 sm:mb-16" aria-label={t.tastingMenu}>
   <div class="mb-4 flex items-center justify-between border-b border-sand/15 pb-2">
     <span class="font-mono text-xs uppercase tracking-widest text-muted">
-      {chinese ? '萃取菜单 · 四种思考形态' : 'The Tasting Menu · Four Extractions'}
+      {t.tastingMenuHeading}
     </span>
     <span class="font-mono text-[11px] text-sand/60" data-filter-indicator>
-      {chinese ? '全部文章' : 'All brews'}
+      {t.allBrews}
     </span>
   </div>
 
-  <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4" role="group" aria-label={chinese ? '按萃取方式筛选' : 'Filter essays by brew'}>
+  <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4" role="group" aria-label={t.filterByBrew}>
     {
       vessels.map((v) => (
         <button
@@ -84,7 +85,7 @@ const VESSEL_IMAGES: Record<BrewType, ImageMetadata> = {
       data-filter-reset
       class="hidden font-mono text-xs text-sand/70 underline underline-offset-4 transition-colors hover:text-cream"
     >
-      {chinese ? '重置并查看全部' : 'Reset to show all'}
+      {t.resetFilter}
     </button>
   </div>
 </section>

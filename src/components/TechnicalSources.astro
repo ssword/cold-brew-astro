@@ -1,15 +1,11 @@
 ---
+import type { SourceKind } from '../lib/essays';
 import type { EssayLanguage } from '../lib/i18n';
+import { uiStrings } from '../lib/ui-strings';
 import Icon from './Icon.astro';
 
 interface TechnicalSource {
-  kind:
-    | 'paper'
-    | 'code'
-    | 'notebook'
-    | 'dataset'
-    | 'documentation'
-    | 'article';
+  kind: SourceKind;
   title: string;
   url: string;
   note?: string;
@@ -22,24 +18,8 @@ interface Props {
 }
 
 const { sources, lang = 'en' } = Astro.props;
-const chinese = lang === 'zh-CN';
-const kindLabels: Record<TechnicalSource['kind'], string> = chinese
-  ? {
-      paper: '论文',
-      code: '代码',
-      notebook: '笔记本',
-      dataset: '数据集',
-      documentation: '文档',
-      article: '文章',
-    }
-  : {
-      paper: 'Paper',
-      code: 'Code',
-      notebook: 'Notebook',
-      dataset: 'Dataset',
-      documentation: 'Documentation',
-      article: 'Article',
-    };
+const t = uiStrings(lang);
+const kindLabels = t.sourceKinds;
 ---
 
 {
@@ -51,9 +31,9 @@ const kindLabels: Record<TechnicalSource['kind'], string> = chinese
       aria-labelledby="technical-sources-title"
     >
       <div class="technical-sources__head">
-        <p>{chinese ? '资料架' : 'Source shelf'}</p>
+        <p>{t.sourceShelf}</p>
         <h2 id="technical-sources-title">
-          {chinese ? '复现与延伸阅读' : 'Reproduce or read further'}
+          {t.sourceShelfTitle}
         </h2>
       </div>
       <ul>

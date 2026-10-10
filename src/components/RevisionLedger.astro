@@ -3,6 +3,7 @@ import {
   formatEssayDate,
   type EssayLanguage,
 } from '../lib/i18n';
+import { uiStrings } from '../lib/ui-strings';
 
 interface Revision {
   date: Date;
@@ -31,7 +32,7 @@ const formatDate = (date: Date) => formatEssayDate(date, lang);
       aria-labelledby="revision-ledger-title"
     >
       <h2 id="revision-ledger-title" class="revision-ledger__title">
-        {lang === 'zh-CN' ? '修订记录' : 'Revision notes'}
+        {uiStrings(lang).revisionNotes}
       </h2>
       <ol>
         {revisions.map((revision) => (

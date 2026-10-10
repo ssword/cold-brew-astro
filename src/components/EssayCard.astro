@@ -5,6 +5,7 @@ import {
   languageOf,
   type EssayLanguage,
 } from '../lib/i18n';
+import { uiStrings } from '../lib/ui-strings';
 import StatusTag from './StatusTag.astro';
 import BrewBadge from './BrewBadge.astro';
 
@@ -43,7 +44,7 @@ const titleSize = featured ? 'text-3xl sm:text-4xl' : 'text-2xl sm:text-3xl';
     <BrewBadge brew={essay.data.brew} lang={lang} />
     <span>{date}</span>
     <span class="text-muted/40">•</span>
-    <span>{lang === 'zh-CN' ? `约 ${minutesRead} 分钟` : `${minutesRead} min read`}</span>
+    <span>{uiStrings(lang).minutesRead(minutesRead)}</span>
     <StatusTag status={essay.data.status} lang={lang} />
   </div>
 
