@@ -117,6 +117,37 @@ test.describe('print media', () => {
     expect(text).toMatch(/\n {4}\S/);
   });
 
+  test('printed code wraps long lines instead of clipping them at the page edge', async ({ page }) => {
+    // Roughly the A4 content box (21cm less 2.2cm margins each side) at 96dpi.
+    await page.setViewportSize({ width: 630, height: 900 });
+    await page.goto('/essays/the-loss-landscape-is-mostly-flat/');
+    for (const pre of await page.locator('article.essay pre').all()) {
+      const { scroll, client } = await pre.evaluate((el) => ({
+        scroll: el.scrollWidth,
+        client: el.clientWidth,
+      }));
+      expect(scroll).toBeLessThanOrEqual(client);
+    }
+  });
+
+  test('printed footnotes are numbered so references can be matched on paper', async ({ page }) => {
+    await page.goto(ESSAY);
+    const listStyle = await page
+      .locator('section[data-footnotes] ol')
+      .evaluate((el) => getComputedStyle(el).listStyleType);
+    expect(listStyle).toBe('decimal');
+  });
+
+  test('printed source cards stay whole and keep the shelf heading with its sources', async ({ page }) => {
+    await page.goto(ESSAY);
+    const item = page.locator('[data-technical-sources] li').first();
+    expect(await item.evaluate((el) => getComputedStyle(el).breakInside)).toBe('avoid');
+    // The shelf is kept together so its label is never stranded at the foot of a page.
+    const shelf = page.locator('[data-technical-sources]');
+    expect(await shelf.evaluate((el) => getComputedStyle(el).breakInside)).toBe('avoid');
+    await expect(shelf.locator('svg').first()).toBeHidden();
+  });
+
   test('printing a Chinese essay drops the chrome and keeps the prose', async ({ page }) => {
     await page.goto(ZH_ESSAY);
     for (const selector of ['body > header', 'body > footer', '[data-reader-dock]', '.essay-reply']) {
@@ -133,6 +164,13 @@ test.describe('print media', () => {
     await expect(meta).toContainText('2026');
     await expect(page.locator('[data-last-revised]')).toBeVisible();
   });
+});
+
+test('a short Chinese essay saves to PDF without a trailing blank page', async ({ page }) => {
+  await page.goto(ZH_ESSAY);
+  const pdf = (await page.pdf({ format: 'A4' })).toString('latin1');
+  const pages = pdf.match(/\/Type\s*\/Page(?!s)/g) ?? [];
+  expect(pages.length).toBe(1);
 });
 
 test('the print identity line stays off the screen layout', async ({ page }) => {
