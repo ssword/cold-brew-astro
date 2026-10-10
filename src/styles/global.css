@@ -439,6 +439,8 @@ body {
   body {
     background: #fff !important;
     font-size: 11pt;
+    /* min-h-screen would spill a short essay onto a blank second sheet. */
+    min-height: 0 !important;
   }
 
   [data-atmosphere],
@@ -473,6 +475,8 @@ body {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
     white-space: pre-wrap;
+    /* Paper cannot scroll: break even unspaced tokens rather than clip them. */
+    overflow-wrap: anywhere;
   }
 
   .essay :is(h1, h2, h3) {
@@ -484,5 +488,12 @@ body {
   .essay p {
     orphans: 3;
     widows: 3;
+  }
+
+  /* Paper has no hover or jump links: number the notes so a superscript can
+     be matched to its text by eye. */
+  .essay .footnotes ol {
+    list-style: decimal;
+    padding-left: 1.5em;
   }
 }
