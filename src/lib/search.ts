@@ -42,7 +42,7 @@ interface SearchableEssay {
  * Language editions with a search surface. Each gets its own index file so a
  * page loads only its edition's data.
  */
-export const SEARCH_LANGUAGES: readonly EssayLanguage[] = ['en'];
+export const SEARCH_LANGUAGES: readonly EssayLanguage[] = ['en', 'zh-CN'];
 
 /** Where the built index for a language edition is served. */
 export function searchIndexHref(language: EssayLanguage): string {
