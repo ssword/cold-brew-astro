@@ -39,16 +39,26 @@ export function languageFromRoute(route: string): EssayLanguage | undefined {
   );
 }
 
+// Default-language routes are unprefixed; every other edition lives under
+// its route segment. All locale paths below are built from this one prefix.
+function localePrefix(language: EssayLanguage): string {
+  return language === DEFAULT_LANGUAGE ? '' : `/${LANGUAGE_INFO[language].route}`;
+}
+
 export function localeHome(language: EssayLanguage): string {
-  return language === DEFAULT_LANGUAGE
-    ? '/'
-    : `/${LANGUAGE_INFO[language].route}/`;
+  return `${localePrefix(language)}/`;
 }
 
 export function localeFeed(language: EssayLanguage): string {
-  return language === DEFAULT_LANGUAGE
-    ? '/rss.xml'
-    : `/${LANGUAGE_INFO[language].route}/rss.xml`;
+  return `${localePrefix(language)}/rss.xml`;
+}
+
+export function localeTagsIndex(language: EssayLanguage): string {
+  return `${localePrefix(language)}/tags/`;
+}
+
+export function localeSearch(language: EssayLanguage): string {
+  return `${localePrefix(language)}/search/`;
 }
 
 // Frontmatter dates are calendar days parsed as UTC midnight, so they are
@@ -78,19 +88,14 @@ export function essaySlug(essay: LocalizedEntry): string {
 }
 
 export function localizedEssayHref(essay: LocalizedEntry): string {
-  const language = languageOf(essay.data);
-  const prefix =
-    language === DEFAULT_LANGUAGE ? '' : `/${LANGUAGE_INFO[language].route}`;
-  return `${prefix}/essays/${essaySlug(essay)}/`;
+  return `${localePrefix(languageOf(essay.data))}/essays/${essaySlug(essay)}/`;
 }
 
 export function localizedTagHref(
   slug: string,
   language: EssayLanguage,
 ): string {
-  const prefix =
-    language === DEFAULT_LANGUAGE ? '' : `/${LANGUAGE_INFO[language].route}`;
-  return `${prefix}/tags/${slug}/`;
+  return `${localeTagsIndex(language)}${slug}/`;
 }
 
 export function essaysInLanguage<

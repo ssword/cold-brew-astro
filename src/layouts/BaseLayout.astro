@@ -18,6 +18,8 @@ import Icon from '../components/Icon.astro';
 import {
   localeFeed,
   localeHome,
+  localeSearch,
+  localeTagsIndex,
   type EssayLanguage,
   type LanguageAlternate,
 } from '../lib/i18n';
@@ -58,9 +60,9 @@ const homeHref = localeHome(lang);
 const feedHref = localeFeed(lang);
 const localizedNav = chinese
   ? [
-      { label: '文章', href: '/zh/' },
-      { label: '标签', href: '/zh/tags/' },
-      { label: '搜索', href: '/zh/search/' },
+      { label: '文章', href: homeHref },
+      { label: '标签', href: localeTagsIndex(lang) },
+      { label: '搜索', href: localeSearch(lang) },
       { label: '关于', href: '/about/' },
     ]
   : NAV;

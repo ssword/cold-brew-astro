@@ -3,7 +3,7 @@
 // built at deploy time (see src/pages/search-index/); queries are matched in
 // the browser and never leave it.
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { localeHome, type EssayLanguage } from '../lib/i18n';
+import { localeTagsIndex, type EssayLanguage } from '../lib/i18n';
 import { searchIndexHref } from '../lib/search';
 import { uiStrings } from '../lib/ui-strings';
 
@@ -14,7 +14,7 @@ interface Props {
 
 const { lang, description } = Astro.props;
 const t = uiStrings(lang);
-const tagsHref = `${localeHome(lang)}tags/`;
+const tagsHref = localeTagsIndex(lang);
 ---
 
 <BaseLayout lang={lang} title={t.search} description={description}>
@@ -80,7 +80,6 @@ const tagsHref = `${localeHome(lang)}tags/`;
       list.replaceChildren(
         ...hits.map((hit) => {
           const item = document.createElement('li');
-          item.className = 'search-result';
 
           const meta = document.createElement('p');
           meta.className = 'font-mono text-xs uppercase tracking-widest text-muted';
