@@ -67,7 +67,11 @@ const updatedDate = essay.data.updatedDate
   <!-- Reading-progress bar (scroll %), filled in by the reader script. -->
   <div class="reader-progress" aria-hidden="true"><span data-progress-bar></span></div>
 
-  <article class="essay" data-essay>
+  <article
+    class="essay"
+    data-essay
+    style={`--print-origin: ${JSON.stringify(canonical.origin)}`}
+  >
     <header class="essay-head">
       <div class="print-identity font-mono" data-print-identity>
         {SITE_TITLE} · {AUTHOR.name} · {canonical.href}

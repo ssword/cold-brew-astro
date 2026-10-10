@@ -471,6 +471,15 @@ body {
     word-break: break-all;
   }
 
+  /* Root-relative links in the prose print as absolute addresses: the essay
+     sets --print-origin to the site's origin. Header chips (tags, editions)
+     and in-page `#` anchors such as footnote links print nothing extra. */
+  .essay > :not(.essay-head) a[href^='/']:not([href^='//'])::after {
+    content: ' (' var(--print-origin) attr(href) ')';
+    font-size: 0.8em;
+    word-break: break-all;
+  }
+
   .essay pre {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;

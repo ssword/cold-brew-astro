@@ -1,9 +1,23 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Locator } from '@playwright/test';
 import { parseRgb } from './_utils';
 
 const ESSAY = '/essays/a-map-of-the-hedge/';
 const ZH_ESSAY = '/zh/essays/first-light/';
 const SAND: [number, number, number] = [212, 189, 166];
+
+// The text a link prints after itself: its `::after` content with each
+// string and `attr()` resolved, or `none` when nothing is appended.
+async function printedSuffix(link: Locator): Promise<string> {
+  return link.evaluate((el) => {
+    const content = getComputedStyle(el, '::after').content;
+    if (content === 'none' || content === 'normal') return 'none';
+    return [...content.matchAll(/"((?:[^"\\]|\\.)*)"|attr\(([^)]+)\)/g)]
+      .map(([, text, attr]) =>
+        attr ? (el.getAttribute(attr.trim()) ?? '') : text.replace(/\\(.)/g, '$1'),
+      )
+      .join('');
+  });
+}
 
 for (const { path, name } of [
   { path: ESSAY, name: 'Print or save as PDF' },
@@ -127,6 +141,32 @@ test.describe('print media', () => {
         client: el.clientWidth,
       }));
       expect(scroll).toBeLessThanOrEqual(client);
+    }
+  });
+
+  test('a printed external link in the prose shows where it points', async ({ page }) => {
+    await page.goto(ESSAY);
+    const link = page.locator('article.essay > p a[href^="https://"]').first();
+    await expect(link).toBeVisible();
+    const href = await link.getAttribute('href');
+    expect(await printedSuffix(link)).toBe(` (${href})`);
+  });
+
+  test('a printed internal link in the prose shows its absolute address', async ({ page }) => {
+    await page.goto(ESSAY);
+    const link = page.locator('article.essay > p a[href="/essays/the-long-steep/"]');
+    await expect(link).toBeVisible();
+    expect(await printedSuffix(link)).toBe(' (https://coldbrew.live/essays/the-long-steep/)');
+  });
+
+  test('printed footnote references, back-links, and tag chips carry no URL', async ({ page }) => {
+    await page.goto(ESSAY);
+    for (const selector of [
+      'sup a[data-footnote-ref]',
+      'a[data-footnote-backref]',
+      '[data-essay-tags] a',
+    ]) {
+      expect(await printedSuffix(page.locator(selector).first())).toBe('none');
     }
   });
 
