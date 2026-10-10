@@ -40,3 +40,5 @@ pnpm-debug.log*
 !.vscode/extensions.json
 .idea/
 .workbuddy/
+
+.claude/
