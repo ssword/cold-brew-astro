@@ -5,6 +5,7 @@ import { publishedEssays, groupByTag, toDisplayEssays } from '../../lib/essays';
 import { essaysInLanguage } from '../../lib/i18n';
 import EssayCard from '../../components/EssayCard.astro';
 import Icon from '../../components/Icon.astro';
+import { SITE_TITLE } from '../../consts';
 
 export async function getStaticPaths() {
   const { published: allPublished } = publishedEssays(await getCollection('essays'));
@@ -29,7 +30,7 @@ const { tag, slug, essays } = Astro.props;
   alternateFeeds={[
     {
       href: `/tags/${slug}/rss.xml`,
-      title: `${tag} essays — cold brew`,
+      title: `${tag} essays — ${SITE_TITLE}`,
     },
   ]}
 >

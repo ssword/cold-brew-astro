@@ -5,13 +5,13 @@ const fontFamily = (loc: Locator) => loc.evaluate((el) => getComputedStyle(el).f
 test('typography roles map to the four self-hosted fonts, with a CJK fallback slot', async ({ page }) => {
   await page.goto('/essays/first-light/');
 
-  const title = page.locator('header a[href="/"] .serif-display'); // masthead → display
+  const title = page.locator('header a[href="/"] .font-wild'); // masthead → hand-lettered
   const heading = page.getByRole('heading', { level: 1, name: 'First light' }); // display
   const body = page.locator('article p').first(); // body → reading serif
   const footer = page.locator('footer'); // UI/metadata → mono
 
   expect(await fontFamily(heading)).toMatch(/Fraunces/);
-  expect(await fontFamily(title)).toMatch(/Fraunces/);
+  expect(await fontFamily(title)).toMatch(/Permanent Marker/);
   expect(await fontFamily(body)).toMatch(/Newsreader/);
   expect(await fontFamily(footer)).toMatch(/JetBrains Mono/);
 
